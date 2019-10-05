@@ -684,7 +684,7 @@ int getCost(int cardNumber)
 
 /* --- FUNCTIONS FOR ASSIGNMENT 2 --- */
 
-int baronCard(int choice1, int currentPlayer, struct gameState* state)
+int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* state)
 {
     state->numBuys++;//Increase buys by 1!
         if (choice1 > 0) { //Boolean true or going to discard an estate
@@ -735,6 +735,8 @@ int baronCard(int choice1, int currentPlayer, struct gameState* state)
             }
         }
 
+        /* Possible Fix */
+        discardCard(handPos, currentPlayer, state, 0);  // Piazza Post (Find and Fix Dominion Bugs) - Tim Palecek
 
         return 0;
 }
@@ -845,6 +847,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             {
                 if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
                 {
+                    state->supplyCount[choice1]++;  // Piazza Post (Find and Fix DOminon Bugs) - Brian Terrell
                     discardCard(i, currentPlayer, state, 1);
                     break;
                 }
@@ -856,7 +859,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
 }
 
 
-int tributeCard(int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state){
+int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state){
     int i;
    if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
             if (state->deckCount[nextPlayer] > 0) {
@@ -914,6 +917,8 @@ int tributeCard(int currentPlayer, int nextPlayer, int tributeRevealedCards[], s
             }
         }
 
+        discardCard(handPos, currentPlayer, state, 0); // Piazza Post (Find and Fix Dominion Bugs) - Robert Saraceno
+
         return 0;
 
 
@@ -933,7 +938,7 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
             return -1;
         }
 
-        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
+        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) )  // // Piazza Post (Find and Fix Dominino Bugs)
         {
             return -1;
         }
@@ -948,7 +953,7 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
         {
             if (state->hand[currentPlayer][i] == j)
             {
-                discardCard(i, currentPlayer, state, 0);
+                discardCard(i, currentPlayer, state, 1);  // Piazza Post (Find and Fix Dominino Bugs)
                 break;
             }
         }
@@ -1090,45 +1095,12 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
     case mine:
 
         retVal = mineCard(handPos, currentPlayer, choice1, choice2, state);
-
-        j = state->hand[currentPlayer][choice1];  //store card we will trash
-
-        if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
-        {
-            return -1;
-        }
-
-        if (choice2 > treasure_map || choice2 < curse)
-        {
-            return -1;
-        }
-
-        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
-        {
-            return -1;
-        }
-
-        gainCard(choice2, state, 2, currentPlayer);
-
-        //discard card from hand
-        discardCard(handPos, currentPlayer, state, 0);
-
-        //discard trashed card
-        for (i = 0; i < state->handCount[currentPlayer]; i++)
-        {
-            if (state->hand[currentPlayer][i] == j)
-            {
-                discardCard(i, currentPlayer, state, 0);
-                break;
-            }
-        }
-
-        return 0;
+        return retVal;
 
     case remodel:
         j = state->hand[currentPlayer][choice1];  //store card we will trash
 
-        if ( (getCost(state->hand[currentPlayer][choice1]) + 2) > getCost(choice2) )
+        if ( (getCost(state->hand[currentPlayer][choice1]) + 2) < getCost(choice2) ) // Piazza Post (Find and Fix Dominion Bugs)
         {
             return -1;
         }
@@ -1143,7 +1115,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
         {
             if (state->hand[currentPlayer][i] == j)
             {
-                discardCard(i, currentPlayer, state, 0);
+                discardCard(i, currentPlayer, state, 1);  // Piazza Post (Find and Fix Dominion Bugs)
                 break;
             }
         }
@@ -1175,7 +1147,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case baron:
         //return baronCard(choice1, currentPlayer, state);
-        retVal = baronCard(choice1, currentPlayer, state);
+        retVal = baronCard(handPos, choice1, currentPlayer, state);
         return retVal;
 
     case great_hall:
@@ -1219,65 +1191,9 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case tribute:
 
-        retVal = tributeCard(currentPlayer, nextPlayer, tributeRevealedCards, state);
+        retVal = tributeCard(handPos, currentPlayer, nextPlayer, tributeRevealedCards, state);
 
-        if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
-            if (state->deckCount[nextPlayer] > 0) {
-                tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-                state->deckCount[nextPlayer]--;
-            }
-            else if (state->discardCount[nextPlayer] > 0) {
-                tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
-                state->discardCount[nextPlayer]--;
-            }
-            else {
-                //No Card to Reveal
-                if (DEBUG) {
-                    printf("No cards to reveal\n");
-                }
-            }
-        }
-
-        else {
-            if (state->deckCount[nextPlayer] == 0) {
-                for (i = 0; i < state->discardCount[nextPlayer]; i++) {
-                    state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
-                    state->deckCount[nextPlayer]++;
-                    state->discard[nextPlayer][i] = -1;
-                    state->discardCount[nextPlayer]--;
-                }
-
-                shuffle(nextPlayer,state);//Shuffle the deck
-            }
-            tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
-            state->deckCount[nextPlayer]--;
-            tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
-            state->deckCount[nextPlayer]--;
-        }
-
-        if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
-            state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
-            state->playedCardCount++;
-            tributeRevealedCards[1] = -1;
-        }
-
-        for (i = 0; i <= 2; i ++) {
-            if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
-                state->coins += 2;
-            }
-
-            else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
-                drawCard(currentPlayer, state);
-                drawCard(currentPlayer, state);
-            }
-            else { //Action Card
-                state->numActions = state->numActions + 2;
-            }
-        }
-
-        return 0;
+        return retVal;
 
     case ambassador:
 

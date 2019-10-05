@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "rngs.h"
 #include <stdlib.h>
+#include <time.h>
 
 int main (int argc, char** argv) {
     struct gameState G;
@@ -11,7 +12,7 @@ int main (int argc, char** argv) {
 
     printf ("Starting game.\n");
 
-    initializeGame(2, k, atoi(argv[1]), &G);
+    initializeGame(2, k, time(0), &G);  // Piazza Post (Recommended Find and Fix Dominion Bugs by Mandi)
 
     int money = 0;
     int smithyPos = -1;

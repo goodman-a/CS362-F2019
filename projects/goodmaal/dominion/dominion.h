@@ -129,11 +129,12 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state);
    1, others to 0 */
 
 
+/* - Assignment 2 Card Refactors - */
 
-int baronRefactor(int choice1, int currentPlayer, struct gameState* state);
-int minionRefactor(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
-int ambassadorRefactor(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
-int tributeRefactor(int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state);
-int mineRefactor(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
+int baronCard(int choice1, int currentPlayer, struct gameState* state);
+int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
+int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
+int tributeCard(int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state);
+int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
 
 #endif

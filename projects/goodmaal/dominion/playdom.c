@@ -12,7 +12,7 @@ int main (int argc, char** argv) {
 
     printf ("Starting game.\n");
 
-    initializeGame(2, k, time(0), &G);  // Piazza Post (Recommended Find and Fix Dominion Bugs by Mandi)
+    initializeGame(2, k, time(0), &G);  //Currently Hard Coded at 2 
 
     int money = 0;
     int smithyPos = -1;
@@ -39,6 +39,7 @@ int main (int argc, char** argv) {
                 adventurerPos = i;
         }
 
+        // Check to see whose turn it is. Need to a dynamic solution to however many the user inputs
         if (whoseTurn(&G) == 0) {
             if (smithyPos != -1) {
                 printf("0: smithy played from position %d\n", smithyPos);

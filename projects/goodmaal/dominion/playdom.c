@@ -124,7 +124,7 @@ int main (int argc, char** argv) {
                 printf("1: bought silver\n");
                 buyCard(silver, &G);
             }
-            printf("1: endTurn\n");
+            printf("1: end turn\n");
 
             endTurn(&G);
         }

@@ -713,7 +713,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                     if (supplyCount(estate, state) > 0) {
                         gainCard(estate, state, 0, currentPlayer);
 
-                        // Piazza Post - Mandi Grant (Already decrements in the gainCard method)
+                        // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                         //state->supplyCount[estate]--;//Decrement estates
                         if (supplyCount(estate, state) == 0) {
                             isGameOver(state);
@@ -732,7 +732,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
             if (supplyCount(estate, state) > 0) {
                 gainCard(estate, state, 0, currentPlayer);//Gain an estate
 
-                // Piazza Post - Mandi Grant (Already decrements in the gainCard method)
+                // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                 //state->supplyCount[estate]--;//Decrement Estates  
                 if (supplyCount(estate, state) == 0) {
                     isGameOver(state);
@@ -740,14 +740,14 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
             }
         }
 
-        discardCard(handPos, currentPlayer, state, 0);  // Piazza Post (Find and Fix Dominion Bugs) - Tim Palecek
+        discardCard(handPos, currentPlayer, state, 0);  // Piazza Post - Tim Palecek
 
         return 0;
 }
 
 int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state)
 {
-    int i,j = 0;
+    int i,j = 0; // Iterators (Added after relocating from Switch Statement)
     
     //+1 action
     state->numActions++;
@@ -829,7 +829,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
         if (DEBUG)
             printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
 
-        //increase supply count for choosen card by amount being discarded
+        //increase supply count for chosen card by amount being discarded
         state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
 
         //each other player gains a copy of revealed card
@@ -851,7 +851,6 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             {
                 if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
                 {
-                    // state->supplyCount[choice1]++;  // Piazza Post (Find and Fix DOminon Bugs) - Brian Terrell
                     discardCard(i, currentPlayer, state, 1);
                     break;
                 }
@@ -868,16 +867,16 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
    if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
             if (state->deckCount[nextPlayer] > 0) {
                 tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-                // Piazza Post (Find and Fix Dominion Bugs) - Brian Terrell
+                // Piazza Post  - Brian Terrell
                 state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->discardCount[nextPlayer]++;
-                state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+                state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
 
                 state->deckCount[nextPlayer]--;
             }
             else if (state->discardCount[nextPlayer] > 0) {
                 tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
-                // state->discardCount[nextPlayer]--; // Piazza Post (Find and Fix Dominion Bugs) - Brian Terrell
+                // state->discardCount[nextPlayer]--; // Piazza Post  - Brian Terrell
             }
             else {
                 //No Card to Reveal
@@ -899,18 +898,18 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
                 shuffle(nextPlayer,state);//Shuffle the deck
             }
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post (Find and Fix Dominion Bugs) - Brian Terrell
+            // Piazza Post - Brian Terrell
             state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             state->discardCount[nextPlayer]++;
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
             state->deckCount[nextPlayer]--;
             tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post (Find and Fix Dominion Bugs) - Brian Terrell
+            // Piazza Post - Brian Terrell
             state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             state->discardCount[nextPlayer]++;
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
             state->deckCount[nextPlayer]--;
         }
 
@@ -920,7 +919,7 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             tributeRevealedCards[1] = -1;
         }
 
-        for (i = 0; i < 2; i ++) {   // Piazza Post (Find and Fix Dominion Bugs) - Brian Terrell
+        for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
             if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
                 state->coins += 2;
             }
@@ -939,7 +938,7 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             }
         }
 
-        discardCard(handPos, currentPlayer, state, 0); // Piazza Post (Find and Fix Dominion Bugs) - Robert Saraceno
+        discardCard(handPos, currentPlayer, state, 0); // Piazza Post - Robert Saraceno
 
         return 0;
 
@@ -961,7 +960,7 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
             return -1;
         }
 
-        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) )  // // Piazza Post (Find and Fix Dominino Bugs)
+        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) )  // // Piazza Post 
         {
             return -1;
         }
@@ -976,7 +975,7 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
         {
             if (state->hand[currentPlayer][i] == j)
             {
-                discardCard(i, currentPlayer, state, 1);  // Piazza Post (Find and Fix Dominino Bugs)
+                discardCard(i, currentPlayer, state, 1);  // Piazza Post 
                 break;
             }
         }
@@ -1360,6 +1359,10 @@ int discardCard(int handPos, int currentPlayer, struct gameState *state, int tra
         //add card to played pile
         state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
         state->playedCardCount++;
+
+        // Piazza Post - Akifumi Komori
+        state->discard[currentPlayer][ state->discardCount[currentPlayer] ] = state->hand[currentPlayer][handPos];
+        state->discardCount[currentPlayer]++;
     }
 
     //set played card to -1

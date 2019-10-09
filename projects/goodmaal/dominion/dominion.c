@@ -710,8 +710,8 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                         printf("No estate cards in your hand, invalid choice\n");
                         printf("Must gain an estate if there are any\n");
                     }
-                    if (supplyCount(estate, state) > 0) {
-                        gainCard(estate, state, 0, currentPlayer);
+                    if (supplyCount(estate, state) > 0) { 
+                        gainCard(estate, state, 2, currentPlayer); // @Baron Bug 01 - Changed the toFlag to 2 (add to hand) from 0 (add to discard)
 
                         // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                         //state->supplyCount[estate]--;//Decrement estates
@@ -734,9 +734,12 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
 
                 // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                 //state->supplyCount[estate]--;//Decrement Estates  
+
+                /*  // @Baron Bug 02 - Comment out the if-statement checking if game is over after taking an Estate card
                 if (supplyCount(estate, state) == 0) {
                     isGameOver(state);
                 }
+                */
             }
         }
 
@@ -753,7 +756,7 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
     state->numActions++;
 
     //discard card from hand
-    discardCard(handPos, currentPlayer, state, 0);
+    discardCard(handPos, currentPlayer, state, 1);  // @Minion Bug 01 - flipped trash bit to 1
 
     if (choice1)
     {
@@ -778,7 +781,7 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
         {
             if (i != currentPlayer)
             {
-                if (state->handCount[i] > 4)
+                if (state->handCount[i] >= 4)  //@Minion Bug 02 - Changed Conditional from '> 4' to '>=4'
                 {
                     //discard hand
                     while (state->handCount[i] > 0)
@@ -816,7 +819,8 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
 
         for (i = 0; i < state->handCount[currentPlayer]; i++)
         {
-            if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
+            // @Ambassador Bug 01 - Changed '&&' to '||' 
+            if (i != handPos || i == state->hand[currentPlayer][choice1] || i != choice1)
             {
                 j++;
             }
@@ -829,8 +833,9 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
         if (DEBUG)
             printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
 
+        // @Ambassador Bug 02 - Commented Out / Removed the Code that increases the supply count.
         //increase supply count for chosen card by amount being discarded
-        state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
+        //state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
 
         //each other player gains a copy of revealed card
         for (i = 0; i < state->numPlayers; i++)
@@ -894,8 +899,8 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
                     state->discard[nextPlayer][i] = -1;
                     state->discardCount[nextPlayer]--;
                 }
-
-                shuffle(nextPlayer,state);//Shuffle the deck
+                // @Tribute Bug 01 - Commented out shuffle
+                // shuffle(nextPlayer,state);//Shuffle the deck
             }
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             // Piazza Post - Brian Terrell
@@ -925,7 +930,7 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             }
 
             else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
-                drawCard(currentPlayer, state);
+                //drawCard(currentPlayer, state); // @Tribute Bug 02 - Commented out one of the drawCard functions 
                 drawCard(currentPlayer, state);
             }
             // Piazza Post - Mandi Grant
@@ -960,12 +965,12 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
             return -1;
         }
 
-        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) )  // // Piazza Post 
+        if ( (getCost(state->hand[currentPlayer][choice1]) + 3) < getCost(choice2) )  // Piazza Post Fixed
         {
             return -1;
         }
 
-        gainCard(choice2, state, 2, currentPlayer);
+        gainCard(choice2, state, 1, currentPlayer);  // @Mine Bug 01 - changed toFlag to 1 (add to deck) from 2 (add to hand)
 
         //discard card from hand
         discardCard(handPos, currentPlayer, state, 0);
@@ -975,8 +980,8 @@ int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct ga
         {
             if (state->hand[currentPlayer][i] == j)
             {
-                discardCard(i, currentPlayer, state, 1);  // Piazza Post 
-                break;
+                discardCard(i, currentPlayer, state, 1);  // Piazza Post Fixed
+                //break;  // @Mine Bug 02 - Commented out break 
             }
         }
 

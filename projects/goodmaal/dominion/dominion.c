@@ -820,7 +820,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
         for (i = 0; i < state->handCount[currentPlayer]; i++)
         {
             // @Ambassador Bug 01 - Changed '&&' to '||' 
-            if (i != handPos || i == state->hand[currentPlayer][choice1] || i != choice1)
+            if (i != handPos || state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1] || i != choice1) // Piazza Post - Akifumi Komori
             {
                 j++;
             }

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "dominion.h"
 #include "interface.h"
 #include "rngs.h"
@@ -60,8 +61,13 @@ int main(int argc, char* argv[]) {
     int gameStarted = FALSE;
     int turnNum = 0;
 
-    int randomSeed = atoi(argv[1]);
-
+    // Piazza Post - Tim Withers
+    int randomSeed = time(0);
+    if(argc > 1)
+    {
+        randomSeed = atoi(argv[1]);
+    }
+  
     //Default cards, as defined in playDom
     int kCards[10] = {adventurer, gardens, embargo, village, minion, mine, cutpurse, sea_hag, tribute, smithy};
 

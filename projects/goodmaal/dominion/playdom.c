@@ -12,7 +12,8 @@ int main (int argc, char** argv) {
 
     printf ("Starting game.\n");
 
-    initializeGame(2, k, time(0), &G);  //Currently Hard Coded at 2 
+    int seed = argc == 1 ? 0 : atoi(argv[1]);
+    initializeGame(2, k, time(0), &G);  //Currently Hard Coded at 2 ; change seed to time(0)
 
     int money = 0;
     int smithyPos = -1;

@@ -418,13 +418,15 @@ int isGameOver(struct gameState *state) {
 
 int scoreFor (int player, struct gameState *state) {
 
+    // Piazza Post - Joseph Salazar (remove all semicolons) after if-statements
+
     int i;
     int score = 0;
     //score from hand
     for (i = 0; i < state->handCount[player]; i++)
     {
         if (state->hand[player][i] == curse) {
-            score = score - 1;
+            score = score - 1
         };
         if (state->hand[player][i] == estate) {
             score = score + 1;
@@ -467,7 +469,7 @@ int scoreFor (int player, struct gameState *state) {
     }
 
     //score from deck
-    for (i = 0; i < state->discardCount[player]; i++)
+    for (i = 0; i < state->deckCount[player]; i++)  // Piaza Post - Lee Rice
     {
         if (state->deck[player][i] == curse) {
             score = score - 1;

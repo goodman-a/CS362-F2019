@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "rngs.h"
 #include <stdlib.h>
+#include <time.h>
 
 int main (int argc, char** argv) {
     struct gameState G;
@@ -11,7 +12,7 @@ int main (int argc, char** argv) {
 
     printf ("Starting game.\n");
 
-    initializeGame(2, k, atoi(argv[1]), &G);
+    initializeGame(2, k, time(0), &G);  //Currently Hard Coded at 2 
 
     int money = 0;
     int smithyPos = -1;
@@ -38,6 +39,7 @@ int main (int argc, char** argv) {
                 adventurerPos = i;
         }
 
+        // Check to see whose turn it is. Need to a dynamic solution to however many the user inputs
         if (whoseTurn(&G) == 0) {
             if (smithyPos != -1) {
                 printf("0: smithy played from position %d\n", smithyPos);
@@ -122,7 +124,7 @@ int main (int argc, char** argv) {
                 printf("1: bought silver\n");
                 buyCard(silver, &G);
             }
-            printf("1: endTurn\n");
+            printf("1: end turn\n");
 
             endTurn(&G);
         }

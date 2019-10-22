@@ -100,7 +100,7 @@ int main(int argc, char** argv){
 	{	
 		// Initialize the game to populate decks.
 		memset(&state, 0, sizeof(struct gameState));   // clear the game state
-		r = initializeGame(num_players, k, seed, &state); // initialize a new game
+		r = initializeGame(num_players, k, seed, state); // initialize a new game
 		
 		// Set-up Hand
 /* 		state.handCount[player1] = hand_count;

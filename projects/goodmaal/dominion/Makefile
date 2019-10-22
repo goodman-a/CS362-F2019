@@ -46,4 +46,4 @@ unittest1: unittest1.c dominion.o rngs.o
 all: playdom player 
 
 clean:
-	rm -f *.o playdom.exe playdom player player.exe unittest1.exe *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe
+	rm -f *.o playdom.exe playdom player player.exe unittest1 unittest1.exe *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe

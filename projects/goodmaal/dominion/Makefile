@@ -40,7 +40,7 @@ unittestresults.out: unittest1.c dominion.o
 
 
 unittest1: unittest1.c dominion.o rngs.o
-	gcc -o unittest1 dominion.c rngs.c unittest1.c $(CFLAGS)
+	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)
 
 
 all: playdom player 

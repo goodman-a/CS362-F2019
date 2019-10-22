@@ -70,60 +70,110 @@ int AssertTest(int pass, char* msg)
 
 int main(int argc, char** argv){
 
-    /* -- Constant Parameters -- */
-    int player1 = 0;
-
-
-
     /* -- Variables for Comparison, Checks, and Verifications -- */
 
-    // General Variables
-    int i, r, count_hand, count_discard, count_deck;
+    // iterators
+    int i, r, m;
+    // Total Counts
+    //int count_hand, count_discard, count_deck, count_buys;
+
+    // Passed in gameplay values
     int handPos = 0, choice1 = 0, bonus = 0;
+
+    // Setup/Initialize Parameters
     int seed = 1000;
+    int player1 = 0;
     int num_players = 2;
+    int num_hand = 5;
 
-    // Flags
-
+    // Store return baron value ... kinda worthless here..
+    int baron_return;
 
 	// Kingdom Cards
 	int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
 
     // Declare Game State
-    struct gameState state;
+    struct gameState state, testState;
 
     // Declare Arrays
 
 
 	// Reset Game for a Controlled Test
-	void ResetGame(struct gameState *state)
+	void ResetGame(struct gameState *state, int num_hand)
 	{	
 		// Initialize the game to populate decks.
-		memset(&state, 0, sizeof(struct gameState));   // clear the game state
+		memset(state, 0, sizeof(struct gameState));   // clear the game state
 		r = initializeGame(num_players, k, seed, state); // initialize a new game
-		
+
+        if (r<0){printf("ERROR DURING INITIALIZATION\n");}
+
+        // Display Original Starting Hand
+	    printf("Initialized Hand: ");
+        for (m=0; m<state->handCount[player1]; m++) {
+        printf("(%d)", state->hand[player1][m]);
+        }
+        printf("; \n");
+
 		// Set-up Hand
-/* 		state.handCount[player1] = hand_count;
-		state.hand[player1][0] = curse;
-		state.hand[player1][1] = copper;
-		state.hand[player1[2] = silver;
-		state.hand[player1][3] = gold;
-		state.hand[player1][4] = estate;
-		state.hand[player1][5] = treasure_map; */
+        // WILL NEED TO DECREMENT SUPPLY COUNT TOO ... ugh and add to hand? hmm
+		state->handCount[player1] = num_hand;
+		state->hand[player1][0] = curse;
+		state->hand[player1][1] = copper;
+		state->hand[player1][2] = silver;
+		state->hand[player1][3] = gold;
+		state->hand[player1][4] = estate; //estate
 	}
 
 
     /* -- TESTING -- */
     //printf("\n---------- BARON CARD TEST ----------\n");
+    ResetGame(&state, num_hand);
+    memcpy(&testState, &state, sizeof(struct gameState));
+
+
+    printf("Current Hand: ");
+    for (m=0; m<testState.handCount[player1]; m++) {
+        printf("(%d)", testState.hand[player1][m]);
+    }
+    printf("; \n");
+
+
+
+    handPos = 4;
+    choice1 = 0;
+    bonus = 0;
+
+
+/*     printf("Before - Number of Buys = %d\n", state.numBuys);    
+    printf("Before - hand count = %d\n", state.handCount[player1]);
+    printf("Before - deck count = %d\n", state.deckCount[player1]);
+    printf("Before - discard count = %d\n", state.discardCount[player1]);
+    printf("Before - supply count = %d\n", supplyCount(estate, &state)); */
+    printf("Before - bonus = %d\n", bonus);
+    baron_return = baronCard(handPos, choice1, player1, &state, &bonus);
+
+
+/*     printf("After - Number of Buys = %d\n", state.numBuys);    
+    printf("After - hand count = %d\n", state.handCount[player1]);
+    printf("After - deck count = %d\n", state.deckCount[player1]);
+    printf("After - discard count = %d\n", state.discardCount[player1]);
+    printf("After - supply count = %d\n", supplyCount(estate, &state)); */
+    printf("After - bonus = %d\n", bonus);
+
+    printf("Hand Count = %d, Original = %d\n", testState.handCount[player1], state.handCount[player1]);
+    printf("Deck Count = %d, Original = %d\n", testState.deckCount[player1], state.deckCount[player1]);
+    printf("Discard Count = %d, Original = %d\n", testState.discardCount[player1], state.discardCount[player1]);
+    //need a bonus check ....
+
+    printf("Supply Count = %d, Original = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state));    
+
+
+    printf("Baron Value Returned: %d\n", baron_return);
 
 
 
 
-
-
-
-
-
+    // Go Through Differnt Tests and Compare Current (testState) vs Expected (state +/- some value)
 
 
 

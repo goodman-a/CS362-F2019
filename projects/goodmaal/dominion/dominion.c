@@ -739,12 +739,13 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
 
         else {
             if (supplyCount(estate, state) > 0) {
-                gainCard(estate, state, 0, currentPlayer);//Gain an estate
+                // @Bug 02 - Changed gaingin an estate card to gaining a Treasure Card instead (copper...eww)
+                gainCard(copper, state, 0, currentPlayer);//Gain an estate
 
                 // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                 //state->supplyCount[estate]--;//Decrement Estates  
 
-                /*  // @Baron Bug 02 - Comment out the if-statement checking if game is over after taking an Estate card
+                /*  // Originally Bug 02, but decided to refactor out since it does nothing. Leaving commented out for now
                 if (supplyCount(estate, state) == 0) {
                     isGameOver(state);
                 }

@@ -304,8 +304,7 @@ int main(int argc, char** argv){
         DisplayDeck(&testState, player1, "\tCurrent");
     }
 
-     /* -- TEST 3: choice1 <= 0 & 0 Estate Cards in Hand -- */
-    // Note: Bug 02 is located in here
+     /* -- TEST 4: choice1 <= 0 & 0 Estate Cards in Supply -- */
     printf("----- TEST 4: choice1 <= 0 & 0 Estate Card in Supply -----\n");
     // Set-up
     ResetGame(&state, num_hand);
@@ -332,7 +331,7 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
 
     // Check Discard Count has increased by 2
-    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "+2 Discard Count (Should Be Baron)");
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "+1 Discard Count (Should Be Baron)");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+1);}
 
     // Check Estate Supply is still empty

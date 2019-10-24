@@ -739,7 +739,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
 
         else {
             if (supplyCount(estate, state) > 0) {
-                // @Bug 02 - Changed gaingin an estate card to gaining a Treasure Card instead (copper...eww)
+                // @Bug 02 - Changed gaining an estate card to gaining a Treasure Card instead (copper...eww)
                 gainCard(copper, state, 0, currentPlayer);//Gain an estate
 
                 // Piazza Post - Mandi Grant (Already decrements in the gainCard function)

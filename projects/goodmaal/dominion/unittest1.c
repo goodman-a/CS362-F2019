@@ -90,7 +90,7 @@ int main(int argc, char** argv){
 
     // Store return baron value ... kinda worthless here..
     int baron_return, assert_state;
-    //int failFlag = 0; 
+    int flagFail = 0; 
 
 	// Kingdom Cards
 	int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
@@ -111,11 +111,11 @@ int main(int argc, char** argv){
         if (r<0){printf("ERROR DURING INITIALIZATION\n");}
 
         // Display Original Starting Hand
-	    printf("Initialized Hand: ");
+/* 	    printf("Initialized Hand: ");
         for (m=0; m<state->handCount[player1]; m++) {
         printf("(%d)", state->hand[player1][m]);
         }
-        printf("; \n");
+        printf("; \n"); */
 
 		// Set-up Hand
         // WILL NEED TO DECREMENT SUPPLY COUNT TOO ... ugh and add to hand? hmm
@@ -134,66 +134,48 @@ int main(int argc, char** argv){
     memcpy(&testState, &state, sizeof(struct gameState));
 
 
-    void DisplayHand(struct gameState *state, char* msg)
+    void DisplayHand(struct gameState *state, int player1, char* msg)
     {
-        printf("%s Hand: ", msg);
+        printf("%s Hand Pile: ", msg);
         for (m=0; m<state->handCount[player1]; m++) {
-        printf("(%d)", state->hand[player1][m]);
+            printf("(%d)", state->hand[player1][m]);
         }
+        printf("\n");
     }
 
-    printf("Current Hand: ");
-    for (m=0; m<testState.handCount[player1]; m++) {
-        printf("(%d)", testState.hand[player1][m]);
+    void DisplayDiscard(struct gameState *state, int player1, char* msg)
+    {
+        printf("%s Discard Pile: ", msg);
+        for (m=0; m<state->discardCount[player1]; m++) {
+            printf("(%d)", state->discard[player1][m]);
+        }
+        printf("\n");
     }
-    printf("; \n");
 
-/*     printf("Before - Number of Buys = %d\n", state.numBuys);    
-    printf("Before - hand count = %d\n", state.handCount[player1]);
-    printf("Before - deck count = %d\n", state.deckCount[player1]);
-    printf("Before - discard count = %d\n", state.discardCount[player1]);
-    printf("Before - supply count = %d\n", supplyCount(estate, &state)); 
-    printf("Before - bonus = %d\n", bonus);
- */
-    //baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    void DisplayDeck(struct gameState *state, int player1, char* msg)
+    {
+        printf("%s Deck Pile: ", msg);
+        for (m=0; m<state->deckCount[player1]; m++) {
+            printf("(%d)", state->deck[player1][m]);
+        }
+        printf("\n");
+    }    
 
-
-/*     printf("After - Number of Buys = %d\n", state.numBuys);    
-    printf("After - hand count = %d\n", state.handCount[player1]);
-    printf("After - deck count = %d\n", state.deckCount[player1]);
-    printf("After - discard count = %d\n", state.discardCount[player1]);
-    printf("After - supply count = %d\n", supplyCount(estate, &state)); 
-    printf("After - bonus = %d\n", bonus);
-
-    printf("Hand Count = %d, Original = %d\n", testState.handCount[player1], state.handCount[player1]);
-    printf("Deck Count = %d, Original = %d\n", testState.deckCount[player1], state.deckCount[player1]);
-    printf("Discard Count = %d, Original = %d\n", testState.discardCount[player1], state.discardCount[player1]);
-    //need a bonus check ....
-
-    printf("Supply Count = %d, Original = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state));    
-
-*/
-
-
-    // Go Through Differnt Tests and Compare Current (testState) vs Expected (state +/- some value)
+    /* __________ TESTING TIME __________ */
 
     /* -- Test Overview -- */
     // 1. choice1 > 0 & 1 Estate Card in Hand  (if-Statement)
     // 2. choice1 > 0 & 0 Estate Cards in Hand (else if-statement)
-    // 3. choice1 > 0 & Multiple Estate Cards in Hand
+    // *3. choice1 > 0 & Multiple Estate Cards in Hand
     // 4. choice1 < 0 & 0 Estate Cards in Hand
-
+    // 5. Estate Card Supply is at zero ...
     // NEED TO CHECK SUPPLY COUNT GOES DOWN FOR ESTATE WHEN DRAWING...
 
-    // 4. Estate Card Supply Goes to Zero for choice1 > 0
-    // 5. Estate Card Supply Goes to Zero for choice1 <=0
-
-    // Introduced Bugs
+    /* -- Bugs Introduced -- */
         // 1. gainCard flag to 2 from 0 (hand count will increase and discard will not..)
         // 2. gainCard in else statement: receives copper instead of estate
+        // note: other bugs may be present, but some have been fixed during refactoring
 
-  
-    /* __________ TESTING TIME __________ */
 
     /* -- TEST 1: choice1 > 0 & 1 Estate Card in Hand -- */
     printf("----- TEST 1: choice1 > 0 & 1 Estate Card in Hand -----\n");
@@ -201,25 +183,35 @@ int main(int argc, char** argv){
     handPos = 3;
     choice1 = 1;
     bonus = 0;
+    flagFail = 0;
 
     baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // Check numBuys has increased by 1 
     assert_state = AssertTest((testState.numBuys == state.numBuys + 1), "+1 Number of Buys");
-    if(assert_state){printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
+    if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Check Bonus Number has increased to +4
     assert_state = AssertTest((bonus == bonus_start +4 ), "+4 Bonus");
-    if(assert_state) {printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
 
     // Check Hand Count has decreased by 2
-    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-2), "-2 Hand Count (Estate & Baron)");
-    if(assert_state){printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-2);}
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-2), "-2 Hand Count (Should Be Estate & Baron)");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-2);}
 
     // Check Discount Count has increased by 2
-    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Estate & Baron)");
-    if(assert_state){printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Should Be Estate & Baron)");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
+
+    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
+    if(flagFail)
+    {
+        printf("FAILURE DETECTED - Printing Out Card Piles:\n");
+        DisplayHand(&testState, player1, "\tCurrent");
+        DisplayDiscard(&testState, player1, "\tCurrent");
+        DisplayDeck(&testState, player1, "\tCurrent");
+    }
 
 
      /* -- TEST 2: choice1 > 0 & 0 Estate Cards in Hand -- */
@@ -232,45 +224,129 @@ int main(int argc, char** argv){
     handPos = 3;
     choice1 = 1;
     bonus = 0;
+    flagFail = 0;
 
     baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // Check numBuys has increased by 1 
     assert_state = AssertTest((testState.numBuys == state.numBuys + 1), "+1 Number of Buys");
-    if(assert_state){printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
+    if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Check Bonus Number has NOT increased
     assert_state = AssertTest((bonus == bonus_start), "No Bonus");
-    if(assert_state) {printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
 
     // Check Hand Count has decreased by 1
-    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Baron)");
-    if(assert_state){printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
 
     // Check Discard Count has increased by 2
-    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Estate & Baron)");
-    if(assert_state){printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Should Be Estate & Baron)");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
 
     // Check Estate Supply has decreased by 1
     assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, &state)-1), "-1 Estate Supply Count");
-    if(assert_state){printf("\tSupply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state)-1);}    
+    if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state)-1);}    
 
-    // Check to Make Sure No Estates in Hand
+    // Print Out Current Hand vs. Starting Hand.
+    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
+    if(flagFail)
+    {
+        printf("FAILURE DETECTED - Printing Out Card Piles:\n");
+        DisplayHand(&testState, player1, "\tCurrent");
+        DisplayDiscard(&testState, player1, "\tCurrent");
+        DisplayDeck(&testState, player1, "\tCurrent");
+    }
 
+     /* -- TEST 3: choice1 <= 0 & 0 Estate Cards in Hand -- */
+    // Note: Bug 02 is located in here
+    printf("----- TEST 3: choice1 <= 0 & 0 Estate Card in Hand -----\n");
+    // Set-up
+    ResetGame(&state, num_hand);
+	state.hand[player1][4] = gold; // No Longer contains the Estate Card.
+    memcpy(&testState, &state, sizeof(struct gameState));
+    handPos = 3;
+    choice1 = 0;
+    bonus = 0;
+    flagFail = 0;
 
+    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    printf("Baron Value Returned: %d\n", baron_return);
 
+    // Check numBuys has increased by 1 
+    assert_state = AssertTest((testState.numBuys == state.numBuys + 1), "+1 Number of Buys");
+    if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
+    // Check Bonus Number has NOT increased
+    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
 
+    // Check Hand Count has decreased by 1
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
 
+    // Check Discard Count has increased by 2
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Should Be Estate & Baron)");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
 
+    // Check Estate Supply has decreased by 1
+    assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, &state)-1), "-1 Estate Supply Count");
+    if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state)-1);}    
 
+   
+    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
+    if(flagFail)
+    {
+        printf("FAILURE DETECTED - Printing Out Card Piles:\n");
+        DisplayHand(&testState, player1, "\tCurrent");
+        DisplayDiscard(&testState, player1, "\tCurrent");
+        DisplayDeck(&testState, player1, "\tCurrent");
+    }
 
+     /* -- TEST 3: choice1 <= 0 & 0 Estate Cards in Hand -- */
+    // Note: Bug 02 is located in here
+    printf("----- TEST 4: choice1 <= 0 & 0 Estate Card in Supply -----\n");
+    // Set-up
+    ResetGame(&state, num_hand);
+	state.supplyCount[estate]=0;  // set estate supply to zero.
+    memcpy(&testState, &state, sizeof(struct gameState));
+    handPos = 3;
+    choice1 = 0;
+    bonus = 0;
+    flagFail = 0;
 
+    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    printf("Baron Value Returned: %d\n", baron_return);
 
+    // Check numBuys has increased by 1 
+    assert_state = AssertTest((testState.numBuys == state.numBuys + 1), "+1 Number of Buys");
+    if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
+    // Check Bonus Number has NOT increased
+    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
 
+    // Check Hand Count has decreased by 1
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
 
+    // Check Discard Count has increased by 2
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "+2 Discard Count (Should Be Baron)");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+1);}
+
+    // Check Estate Supply is still empty
+    assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, &state)), "Empty Estate Supply");
+    if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, &state));} 
+
+    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
+    if(flagFail)
+    {
+        printf("FAILURE DETECTED - Printing Out Card Piles:\n");
+        DisplayHand(&testState, player1, "\tCurrent");
+        DisplayDiscard(&testState, player1, "\tCurrent");
+        DisplayDeck(&testState, player1, "\tCurrent");
+    }
 
 
     return 0;

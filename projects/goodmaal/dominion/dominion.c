@@ -1383,42 +1383,40 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 int discardCard(int handPos, int currentPlayer, struct gameState *state, int trashFlag)
 {
+    /* -- Refactored from Piazza Post by Kitch McKaen Kelly -- */
 
-    //if card is not trashed, added to Played pile
-    if (trashFlag < 1)
+    //if trash flag is set, add to trash pile
+    if (trashFlag != 0)
     {
-        //add card to played pile
+        //add card to trash pile
         state->trash[state->trashedCardCount] = state->hand[currentPlayer][handPos];
         state->trashedCardCount++;
+    }
 
-        // Piazza Post - Akifumi Komori
-        state->discard[currentPlayer][ state->discardCount[currentPlayer] ] = state->hand[currentPlayer][handPos];
+    //if trash flag is not set, add to player's discard pile
+    else
+    {
+        state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][handPos];
         state->discardCount[currentPlayer]++;
     }
 
+    //remove played card from player's hand
     //set played card to -1
     state->hand[currentPlayer][handPos] = -1;
 
-    //remove card from player's hand
-    if ( handPos == (state->handCount[currentPlayer] - 1) ) 	//last card in hand array is played
+    //if discarded card is not the last card in the player's hand or the only card in the player's hand -> move cards up to fill gap
+    if ((handPos != (state->handCount[currentPlayer] -1 )) && (state->handCount[currentPlayer] != 1))
     {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
+        //need to maintain hand order -> set hand[p] = hand[p+1]
+        for (int p = handPos; p < state->handCount[currentPlayer]; p++)
+        {
+            state->hand[currentPlayer][p] = state->hand[currentPlayer][p + 1];
+        }
+        state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
     }
-    else if ( state->handCount[currentPlayer] == 1 ) //only one card in hand
-    {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
-    else
-    {
-        //replace discarded card with last card in hand
-        state->hand[currentPlayer][handPos] = state->hand[currentPlayer][ (state->handCount[currentPlayer] - 1)];
-        //set last card to -1
-        state->hand[currentPlayer][state->handCount[currentPlayer] - 1] = -1;
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
+
+    //reduce number of cards in hand
+    state->handCount[currentPlayer]--;
 
     return 0;
 }

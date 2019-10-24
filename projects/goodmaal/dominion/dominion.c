@@ -185,7 +185,7 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
     state->phase = 0;
     state->numActions = 1;
     state->numBuys = 1;
-    state->playedCardCount = 0;
+    state->trashedCardCount = 0;
     state->whoseTurn = 0;
     state->handCount[state->whoseTurn] = 0;
     //int it; move to top
@@ -375,7 +375,7 @@ int endTurn(struct gameState *state) {
     state->numActions = 1;
     state->coins = 0;
     state->numBuys = 1;
-    state->playedCardCount = 0;
+    state->trashedCardCount = 0;
     state->handCount[state->whoseTurn] = 0;
 
     //int k; move to top
@@ -945,8 +945,8 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
         }
 
         if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
-            state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
-            state->playedCardCount++;
+            state->trash[state->trashedCardCount] = tributeRevealedCards[1];
+            state->trashedCardCount++;
             tributeRevealedCards[1] = -1;
         }
 
@@ -1388,8 +1388,8 @@ int discardCard(int handPos, int currentPlayer, struct gameState *state, int tra
     if (trashFlag < 1)
     {
         //add card to played pile
-        state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
-        state->playedCardCount++;
+        state->trash[state->trashedCardCount] = state->hand[currentPlayer][handPos];
+        state->trashedCardCount++;
 
         // Piazza Post - Akifumi Komori
         state->discard[currentPlayer][ state->discardCount[currentPlayer] ] = state->hand[currentPlayer][handPos];

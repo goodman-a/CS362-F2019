@@ -774,20 +774,12 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
     }
     else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
+        /* Piazza Post Brian Terrell */
         //discard hand
-
-
-        /* Piazza Post Brian Terrell 
-        while(numHandCards(state) > 0)
-        {
-            discardCard(handPos, currentPlayer, state, 0);
-        } */
-
         while(state->handCount[currentPlayer] > 0 )
         {
             discardCard(0, currentPlayer, state, 0);
         }
-
 
         //draw 4
         for (i = 0; i < 4; i++)
@@ -802,18 +794,12 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
             {
                 if (state->handCount[i] >= 4)  //@Minion Bug 02 - Changed Conditional from '> 4' to '>=4'
                 {
-                    // Piazza Post - Zee
+                    // Piazza Post - Zee  
+                    // discard hand
                     for (j=0; j<state->handCount[i]; j++)
                       {
                           discardCard(j, i, state, 0);
                       }
-                    /*
-                    //discard hand
-                    while (state->handCount[i] > 0)
-                    {
-                        discardCard(handPos, i, state, 0);
-                    }
-                    */
 
                     //draw 4
                     for (j = 0; j < 4; j++)

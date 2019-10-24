@@ -739,7 +739,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
 
         else {
             if (supplyCount(estate, state) > 0) {
-                // @Bug 02 - Changed gaining an estate card to gaining a Treasure Card instead (copper...eww)
+                // @Baron Bug 02 - Changed gaining an estate card to gaining a Treasure Card instead (copper...eww)
                 gainCard(copper, state, 0, currentPlayer);//Gain an estate
 
                 // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
@@ -758,7 +758,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
         return 0;
 }
 
-int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state)
+int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus)
 {
     int i,j = 0; // Iterators (Added after relocating from Switch Statement)
     
@@ -770,11 +770,13 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
 
     if (choice1)
     {
-        state->coins = state->coins + 2;  // change to bonus pointer. similar to baron card (Serena T.)
+        // change to bonus pointer. similar to baron card (Piazza Post - Serena T.)
+        //state->coins = state->coins + 2;  
+        *bonus = 2;
     }
     else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
-        /* Piazza Post Brian Terrell */
+        // Piazza Post - Brian Terrell 
         //discard hand
         while(state->handCount[currentPlayer] > 0 )
         {
@@ -794,12 +796,12 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
             {
                 if (state->handCount[i] >= 4)  //@Minion Bug 02 - Changed Conditional from '> 4' to '>=4'
                 {
-                    // Piazza Post - Zee  
+                    // Piazza Post - Zee & Brian Terrell 
                     // discard hand
-                    for (j=0; j<state->handCount[i]; j++)
-                      {
-                          discardCard(j, i, state, 0);
-                      }
+                    while(state->handCount[i] > 0)
+                    {
+                        discardCard(0, i, state, 0);
+                    }
 
                     //draw 4
                     for (j = 0; j < 4; j++)
@@ -1209,7 +1211,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case minion:
 
-        retVal = minionCard(handPos, currentPlayer, choice1, choice2, state);
+        retVal = minionCard(handPos, currentPlayer, choice1, choice2, state, bonus);
         return retVal;
 
     case steward:

@@ -770,15 +770,24 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
 
     if (choice1)
     {
-        state->coins = state->coins + 2;
+        state->coins = state->coins + 2;  // change to bonus pointer. similar to baron card (Serena T.)
     }
     else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
         //discard hand
+
+
+        /* Piazza Post Brian Terrell 
         while(numHandCards(state) > 0)
         {
             discardCard(handPos, currentPlayer, state, 0);
+        } */
+
+        while(state->handCount[currentPlayer] > 0 )
+        {
+            discardCard(0, currentPlayer, state, 0);
         }
+
 
         //draw 4
         for (i = 0; i < 4; i++)
@@ -794,7 +803,7 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
                 if (state->handCount[i] >= 4)  //@Minion Bug 02 - Changed Conditional from '> 4' to '>=4'
                 {
                     // Piazza Post - Zee
-                    for (j=0; j<state->handCount[currentPlayer]; j++)
+                    for (j=0; j<state->handCount[i]; j++)
                       {
                           discardCard(j, i, state, 0);
                       }

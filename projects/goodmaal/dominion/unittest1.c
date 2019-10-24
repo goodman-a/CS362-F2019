@@ -76,9 +76,6 @@ int main(int argc, char** argv){
     // iterators
     int i, r, m;
 
-    // Total Counts
-    //int count_hand, count_discard, count_deck, count_buys;
-
     // Passed in gameplay values
     int handPos = 0, choice1 = 0, bonus = 0, bonus_start = 0;
 
@@ -98,8 +95,7 @@ int main(int argc, char** argv){
     // Declare Game State
     struct gameState state, testState;
 
-    // Declare Arrays
-
+    /* -- Helper Functions -- */
 
 	// Reset Game for a Controlled Test
 	void ResetGame(struct gameState *state, int num_hand)
@@ -109,13 +105,6 @@ int main(int argc, char** argv){
 		r = initializeGame(num_players, k, seed, state); // initialize a new game
 
         if (r<0){printf("ERROR DURING INITIALIZATION\n");}
-
-        // Display Original Starting Hand
-/* 	    printf("Initialized Hand: ");
-        for (m=0; m<state->handCount[player1]; m++) {
-        printf("(%d)", state->hand[player1][m]);
-        }
-        printf("; \n"); */
 
 		// Set-up Hand
         // WILL NEED TO DECREMENT SUPPLY COUNT TOO ... ugh and add to hand? hmm
@@ -127,13 +116,7 @@ int main(int argc, char** argv){
 		state->hand[player1][4] = estate; //estate
 	}
 
-
-    /* -- TESTING -- */
-    //printf("\n---------- BARON CARD TEST ----------\n");
-    ResetGame(&state, num_hand);
-    memcpy(&testState, &state, sizeof(struct gameState));
-
-
+    // Display Cards in Hand, Discard, and Deck Piles
     void DisplayHand(struct gameState *state, int player1, char* msg)
     {
         printf("%s Hand Pile: ", msg);
@@ -169,17 +152,19 @@ int main(int argc, char** argv){
     // *3. choice1 > 0 & Multiple Estate Cards in Hand
     // 4. choice1 < 0 & 0 Estate Cards in Hand
     // 5. Estate Card Supply is at zero ...
-    // NEED TO CHECK SUPPLY COUNT GOES DOWN FOR ESTATE WHEN DRAWING...
-
+    
     /* -- Bugs Introduced -- */
         // 1. gainCard flag to 2 from 0 (hand count will increase and discard will not..)
         // 2. gainCard in else statement: receives copper instead of estate
         // note: other bugs may be present, but some have been fixed during refactoring
 
+    printf("\n********** BARON CARD TEST **********\n");
 
     /* -- TEST 1: choice1 > 0 & 1 Estate Card in Hand -- */
     printf("----- TEST 1: choice1 > 0 & 1 Estate Card in Hand -----\n");
     // Set-up
+    ResetGame(&state, num_hand);
+    memcpy(&testState, &state, sizeof(struct gameState));
     handPos = 3;
     choice1 = 1;
     bonus = 0;
@@ -200,7 +185,7 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-2), "-2 Hand Count (Should Be Estate & Baron)");
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-2);}
 
-    // Check Discount Count has increased by 2
+    // Check Discard Count has increased by 2
     assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+2), "+2 Discard Count (Should Be Estate & Baron)");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+2);}
 
@@ -346,6 +331,9 @@ int main(int argc, char** argv){
         DisplayDiscard(&testState, player1, "\tCurrent");
         DisplayDeck(&testState, player1, "\tCurrent");
     }
+
+
+    /* --  ONE MORE TEST WHEN ESTATE PILE IS AT 0 WITH CHOICE1 = 1 -- */
 
 
     return 0;

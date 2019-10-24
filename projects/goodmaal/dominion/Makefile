@@ -43,8 +43,11 @@ unittestresults.out: unittest1.c dominion.o
 unittest1: unittest1.c dominion.o rngs.o
 	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)
 
+unittest2: unittest2.c dominion.o rngs.o
+	gcc -o unittest2 -g unittest2.c dominion.o rngs.o $(CFLAGS)
+
 
 all: playdom player 
 
 clean:
-	rm -f *.o playdom.exe playdom player player.exe unittest1 unittest1.exe *.gcov *.gcda *.gcno *.so *.out testDrawCard testDrawCard.exe
+	rm -f *.o playdom player testDrawCard unittest1 unittest2 *.exe *.gcov *.gcda *.gcno *.so *.out 

@@ -834,7 +834,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
         for (i = 0; i < state->handCount[currentPlayer]; i++)
         {
             // @Ambassador Bug 01 - Changed '&&' to '||' 
-            if (i != handPos || state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1] || i != choice1) // Piazza Post - Akifumi Komori
+            if (i != handPos || state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1] || i !=choice1) // Piazza Post - Akifumi Komori
             {
                 j++;
             }
@@ -844,8 +844,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             return -1;
         }
 
-        if (DEBUG)
-            printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
+        //printf("Player %d reveals card number: %d & j-count: %d\n", currentPlayer, state->hand[currentPlayer][choice1],j);
 
         // @Ambassador Bug 02 - Commented Out / Removed the Code that increases the supply count.
         //increase supply count for chosen card by amount being discarded
@@ -860,9 +859,6 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             }
         }
 
-        //discard played card from hand
-        discardCard(handPos, currentPlayer, state, 0);
-
         //trash copies of cards returned to supply
         for (j = 0; j < choice2; j++)
         {
@@ -870,11 +866,26 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             {
                 if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
                 {
+                   // printf("Trash Time: (%d) vs. i: %d\n",state->hand[currentPlayer][choice1],i);
                     discardCard(i, currentPlayer, state, 1);
                     break;
                 }
             }
         }
+
+        // need to relocate where hand position for ambassador card is
+        for (i=0; i < state->handCount[currentPlayer];i++)
+        {
+            if(state->hand[currentPlayer][i] == ambassador)
+            {
+                handPos = i;
+                break;
+            }
+        }
+
+        //discard played card from hand
+        discardCard(handPos, currentPlayer, state, 0);
+
 
         return 0;
 
@@ -1400,7 +1411,7 @@ int discardCard(int handPos, int currentPlayer, struct gameState *state, int tra
         {
             state->hand[currentPlayer][p] = state->hand[currentPlayer][p + 1];
         }
-        state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
+        state->hand[currentPlayer][state->handCount[currentPlayer]-1] = -1;
     }
 
     //reduce number of cards in hand

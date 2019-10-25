@@ -32,13 +32,17 @@ player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
 
-unittestresults.out: unittest1.c dominion.o
+unittestresults.out: unittest1.c unittest2.c dominion.o rngs.o
 	echo "unittest1.c:" >> unittestresults.out
-	gcc -o unittest1 dominion.c rngs.c unittest1.c $(CFLAGS)
+	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)
+	echo "unittest2.c:" >> unittestresults.out
+	gcc -o unittest2 -g unittest2.c dominion.o rngs.o $(CFLAGS)
+	
 	./unittest1 >> unittestresults.out
+	./unittest2 >> unittestresults.out
+
 	gcov -c -b -f dominion.c >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out
-
 
 unittest1: unittest1.c dominion.o rngs.o
 	gcc -o unittest1 -g unittest1.c dominion.o rngs.o $(CFLAGS)

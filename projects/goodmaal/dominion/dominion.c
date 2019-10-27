@@ -892,7 +892,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
 }
 
 
-int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state){
+int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus){
     int i;
    if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
             if (state->deckCount[nextPlayer] > 0) {
@@ -916,7 +916,7 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             }
         }
 
-        else {
+    else {
             if (state->deckCount[nextPlayer] == 0) {
                 for (i = 0; i < state->discardCount[nextPlayer]; i++) {
                     state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
@@ -941,7 +941,7 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
 
             state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
             state->deckCount[nextPlayer]--;
-        }
+    }
 
         if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
             state->trash[state->trashedCardCount] = tributeRevealedCards[1];
@@ -951,7 +951,9 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
 
         for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
             if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
-                state->coins += 2;
+                // Piazza Post - Adams Rosales
+                //state->coins += 2;
+                *bonus += 2;
             }
 
             else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
@@ -1250,7 +1252,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case tribute:
 
-        retVal = tributeCard(handPos, currentPlayer, nextPlayer, tributeRevealedCards, state);
+        retVal = tributeCard(handPos, currentPlayer, nextPlayer, tributeRevealedCards, state, bonus);
 
         return retVal;
 

@@ -898,8 +898,8 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             if (state->deckCount[nextPlayer] > 0) {
                 tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 // Piazza Post  - Brian Terrell
-                state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->discardCount[nextPlayer]++;
+                state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
 
                 state->deckCount[nextPlayer]--;
@@ -917,27 +917,29 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
         }
 
     else {
-            if (state->deckCount[nextPlayer] == 0) {
-                for (i = 0; i < state->discardCount[nextPlayer]; i++) {
+            if (state->deckCount[nextPlayer] == 0) {     
+                int count_discard = state->discardCount[nextPlayer];  
+                for (i = 0; i < count_discard; i++) {
                     state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
                     state->deckCount[nextPlayer]++;
                     state->discard[nextPlayer][i] = -1;
                     state->discardCount[nextPlayer]--;
                 }
                 // @Tribute Bug 01 - Commented out shuffle
-                // shuffle(nextPlayer,state);//Shuffle the deck
+                //shuffle(nextPlayer,state);//Shuffle the deck
             }
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             // Piazza Post - Brian Terrell
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             state->discardCount[nextPlayer]++;
+            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 
             state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
             state->deckCount[nextPlayer]--;
+
             tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             // Piazza Post - Brian Terrell
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             state->discardCount[nextPlayer]++;
+            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 
             state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
             state->deckCount[nextPlayer]--;

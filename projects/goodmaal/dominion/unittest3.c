@@ -437,7 +437,7 @@ int HandCardCount2(struct gameState *state, int player, int choice1, int handPos
     int i;
     for (i = 0; i < state->handCount[player]; i++)
     {
-        if (i != handPos && state->hand[player][i] == state->hand[player][choice1] && i != choice1) // Piazza Post - Akifumi Komori
+        if (i != handPos && state->hand[player][i] == state->hand[player][choice1] && i != choice1) 
         {
             count++;
         }

@@ -143,6 +143,7 @@ void DisplayDiscard(struct gameState *state, int player, char* msg);
 void DisplayDeck(struct gameState *state, int player, char* msg);
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
+int CheckShuffle(struct gameState *state_old, struct gameState *state_new, int player);  // retVal == 1 good, retVal <1 no shuffle
 
 /* -- MAIN FUNCTION -- */
 int main(int argc, char** argv){
@@ -168,21 +169,58 @@ int main(int argc, char** argv){
 
     /* __________ TESTING TIME __________ */
 
-    /* -- Test Overview -- */
-    // Note: All Tests Need....
-
-
+  /* -- Test Overview -- */
+  /* -- 
+      Note: All Tests Need....
+      1. Discard + deck Count is <=1 (discard empty and deck == 1) and card is gold (treasure card)
+        a. Verify tributeRevealedCards[0] == gold and tributeRevealedCards[1] == -1
+        b. Player2: -1 deckCount & +1 discardCount
+        c. Player2: discard[discardCount-1] == gold
+        d. Player1: +2 bonus
+        e. Player1: +1 discardCount
+        f. Player1: +0 numActions
+        g. Player1: +0 handCount
+      2. Discard + Deck Count is <=1 (deck empty and discard ==1) and card is gold (treasure card) <-- maybe do victory card..
+        a. Verify tributeRevealedCards[0] == gold and tributeRevealedCards[1] == -1
+        b. Player2: +0 deckCount & +0 discardCount
+        c. Player2: discard[discardCount-1] == gold
+        d. Player1: +2 bonus
+        e. Player1: +1 discardCount
+        f. Player1: +0 numActions
+        g. Player1: +0 handCount
+      3. Discard + Deck Count is == 0 AND/OR -1
+        a. Verify tributeRevealedCards[0] == -1 and tributeRevealedCards[1] == -1
+        b. Player2: +0 deckCount & +0 discardCount
+        c. Player1: +1 discardCount
+        d. Player1: +0 bonus
+        e. Player1: +0 numActions
+        f. Player1: +0 handCount
+      4. Discard = 1+ & Deck = 1 (should reveal one for each....)
+        a. CheckShuffle  
+      4b. Discard = 2+ and Deck = 0
+      5. 2+ in Deck --> Action & Treasure (Minion & Gold)
+      6. 2+ in Deck --> Action & Victory (Minion & Gardens)
+      7. 2+ in Deck --> Treasure & Victory (Gold & Estate)
+      8. 2+ in Deck --> Treasure & Treasure (Gold & Gold) 
+        a. duplicate card is in trash pile, trashedCardCount +1, tributeRevealedCard[1] == -1 hmmm bug?
+      9. 2+ in Deck --> Treasure & Treasure (Gold & Silver)
+      10. REMEMBER THE CASE WHERE THERE ARE 3+ types and array can't hold...
+  -- */
 
   /* -- List of Bugs -- */
-  // Note: The code provided to the class had LOTS of bugs in this section. Most were fixed during refactoring, but I am sure some are lingering around
-  // Bug 01: Commented out shuffle in the primary else statement
-  // Bug 02: Commented out one of te draw card functions, so only drawing 1 instead of 2..
+  /* --
+    Note: The code provided to the class had LOTS of bugs in this section. Most were fixed during refactoring, but I am sure some are lingering around
+    Bug 01: Commented out shuffle in the primary else statement
+    Bug 02: Commented out one of te draw card functions, so only drawing 1 instead of 2..
+    -- */
+
+
 
 
   printf("\n********** TRIBUTE CARD TEST **********\n");
 
-  /* -- TEST 1:   -- */
-  printf("----- TEST 1: -----\n");
+  /* -- TEST 1: DiscardCount + DeckCount <=1 --> Discard=0 ; Deck = 1 -- */
+  printf("----- TEST 1: Discard = 0 card ; Deck = 1 card-----\n");
 
   // Set-Up
   num_players = 2;
@@ -197,14 +235,15 @@ int main(int argc, char** argv){
   state.hand[player1][handPos] = tribute;
   state.deck[player2][state.deckCount[player2]-1] = gold;
   state.deck[player2][state.deckCount[player2]-2] = silver;
-
+  
   // DEBUG - Display the hands to verify setup.
-  // DisplayHand(&state, player1, "Player1");
-  // DisplayHand(&state, player2, "Player2");
+  DisplayHand(&state, player1, "Player1");
+  DisplayHand(&state, player2, "Player2");
 
   memcpy(&testState, &state, sizeof(struct gameState));
 
-    printf("Player2 Deck Count: %d\n", state.deckCount[player2]);
+  printf("Player2 Discard Count: %d\n", state.discardCount[player2]);
+  printf("Player2 Deck Count: %d\n", state.deckCount[player2]);
   printf("Revealed Cards Array: (%d) & (%d)\n", tributeRevealedCards[0], tributeRevealedCards[1]);
 
   tribute_return = tributeCard(handPos,player1, player2, tributeRevealedCards, &state, &bonus);
@@ -215,6 +254,44 @@ int main(int argc, char** argv){
 
   printf("Player2 Deck Count: %d\n", state.deckCount[player2]);
   printf("Revealed Cards Array: (%d) & (%d)\n", tributeRevealedCards[0], tributeRevealedCards[1]);
+
+
+  /* -- TEST 2: DiscardCount + DeckCount <=1 --> Discard=1 ; Deck = 0 -- */
+  printf("----- TEST 2: Discard = 1 card ; Deck = 0 card-----\n");
+
+
+  /* -- TEST 3: DiscardCount + DeckCount <=1 --> Discard=0 ; Deck = 0 -- */
+  printf("----- TEST 3: Discard = 0 card ; Deck = 0 card-----\n");
+
+
+
+  /* -- TEST 4: DiscardCount + DeckCount > 1 --> Discard = 2+ cards  ; Deck = 0 Cards-- */
+  printf("----- TEST 4: Discard = 2+ cards ; Deck = 0 card-----\n");
+
+
+  /* -- TEST 5: DeckCount >=2 --> Action & Treasure (Minion & Gold) -- */
+  printf("----- TEST 5:DeckCount >= 2 ; Action & Treasure -----\n");
+
+
+  /* -- TEST 6: DeckCount >=2 --> Action & Victory (Minion & Gardens) -- */
+  printf("----- TEST 6:DeckCount >= 2 ; Action & Victory -----\n");
+
+
+  /* -- TEST 7: DeckCount >=2 --> Treasure & Victory (Gold & Estate) -- */
+  printf("----- TEST 7:DeckCount >= 2 ; Treasure & Victory -----\n");
+
+
+  /* -- TEST 8: DeckCount >=2 --> Treasure & Treasure (Gold & Gold) -- */
+  printf("----- TEST 8:DeckCount >= 2 ; Treasure & Treasure (Same) -----\n");
+
+
+  /* -- TEST 9: DeckCount >=2 --> Treasure & Treasure (Silver & Gold) -- */
+  printf("----- TEST 9:DeckCount >= 2 ; Treasure & Treasure (Different) -----\n");
+
+
+
+  /* -- TEST SPECIAL: DiscardCount + DeckCount > 1 --> Discard = 1 cards  ; Deck = 1 Cards-- */
+  printf("----- TEST SPECIAL CASE: Discard = 1+ cards ; Deck = 1 card-----\n");  // should reveal 1 for each...
 
 
   return 0;
@@ -307,6 +384,30 @@ int HandCardCount2(struct gameState *state, int player, int choice1, int handPos
     }
 
     return count;
+}
+
+
+int CheckShuffle(struct gameState *state_old, struct gameState *state_new, int player)
+{
+  int retVal = -1;
+  int i;
+  if(state_new->deckCount[player] != state_old->discardCount[player])
+  {
+      retVal = 1;
+  }
+  else
+  {
+      for(i=0; i<state_new->deckCount[player]; i++)
+      {
+          if(state_new->deck[player][i] != state_old->discard[player][i])
+          {
+              retVal = 1;
+              break;
+          }
+      }
+  }
+  
+    return retVal;
 }
 
 

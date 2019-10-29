@@ -6,7 +6,8 @@
  * 
  * File: unittest2.c
  * 
- * File Description: Minion Card ...
+ * File Description: Unit Test for the Minion Card Function:
+ *  minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus);
  * 
  */
 
@@ -18,7 +19,6 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-
 
 /* -- ASSERT FUNCTION -- */
 int AssertTest(int pass, char* msg)
@@ -37,32 +37,6 @@ int AssertTest(int pass, char* msg)
     
 }
 
-/* minionCard Function General info*/
-
-/*
-  // FOR ALL TESTS:
-    - Check for +1 Actions (state.numActions)
-    - Check Card properly gets Discarded and Not Trashed (BUG 01)
-
-  // TEST 01 - choice1
-    - Check for +2 bonus
-    - Check that no other changes happened besides the Action and Discard
-
-  // TEST 02 - choice2 & Other Players Have <= 4 cards (BUG 02 HERE)
-    - Check that Current Hand was Discarded (discardCount should be original handCount)
-    - Check that New handCount == 4
-
-  // TEST 03 - choice2 & Another Player Has > 4 Cards (BUG 02 HERE)
-    - Check that Current Hand was Discarded (discardCount should be original handCount)
-    - Check that New handCount == 4
-    - Check that player2 handCount == 4
-    - Check that player2 hand is different?
-
-  // TEST 04 - choice2
-
-  // TEST 05 - 
-
-*/
 
 /* -- Constants -- */
 // seed
@@ -91,8 +65,6 @@ int main(int argc, char** argv){
   int player1 = 0;
   int player2 = 1;
   int num_players = 2;
-  //int handNum_player1 = 5;
-  //int handNum_player2 = 5;
 
   // Store return baron value ... kinda worthless here..
   int minion_return, assert_state;
@@ -103,23 +75,23 @@ int main(int argc, char** argv){
 
 
     /* __________ TESTING TIME __________ */
-
-    /* -- Test Overview -- */
+	    /* -- Test Overview -- */
     // Note: All Tests Need to Check for +1 Actions & Discard/Trash Counts (BUG 01 HERE)
-    // 1. choice1 & +2 Buys 
-    // 2. choice2 & player2 hand count > 4 cards (BUG 02 HERE)
-    // 3. choice2 & player2 hand count == 4 cards (BUG 02 HERE)
-    // 4. choice2 & player2 hand count < 4 cards
-    // 5. choice2 & player1 hand count < 4 & player2 hand cout > 4
+    // 1. choice1 & +2 Bonus
+    // 2. choice2 & player2 hand count > 4 (BUG 02 HERE)
+    // 3. choice2 & player2 hand count == 4 (BUG 02 HERE)
+    // 4. choice2 & player2 hand count < 4 
+    // 5. choice2 & player1 hand count < 4 & player2 hand count == 4
+    // *. Future Test: Multiple Opponents with a mixture of < 4 & >4 hand counts
     
     /* -- Bugs Introduced -- */
     // 1. discardCard trash bit high (1) instead of low (0). Trashing Card instead of Discarding
-    // 2. state->handCount[i] >= 4 instead of state->handCount[i] > 4. 
+    // 2. Checking Hand Count is >= 4 Instead of > 4 ; (state->handCount[i] >= 4 instead of state->handCount[i] > 4). 
     // note: other bugs may be present, but some have been fixed during refactoring
 
     printf("\n********** MINION CARD TEST **********\n");
 
-    /* -- TEST 1: choice1 = +2 bonus -- */
+    /* -- TEST 1: choice1 & +2 bonus -- */
     printf("----- TEST 1: choice1 = +2 bonus -----\n");
     // Set-up
     ResetGame(&state, num_players);
@@ -153,8 +125,9 @@ int main(int argc, char** argv){
     // IF FAILURE FLAG IS HIGH PRINT CARD PILES
     if(flagFail)
     {
-        printf("--> *FAILED TEST 01 \n");
-/*      DisplayHand(&testState, player1, "\tCurrent");
+        
+        /* printf("--> *FAILED TEST 01 \n");
+        DisplayHand(&testState, player1, "\tCurrent");
         DisplayDiscard(&testState, player1, "\tCurrent");
         DisplayDeck(&testState, player1, "\tCurrent"); */
     }
@@ -167,8 +140,7 @@ int main(int argc, char** argv){
 
     state.hand[player1][0] = minion;
     SetUpHand(&state, player2, 5);
-    DisplayHand(&state, player1, "Player1");
-    DisplayHand(&state, player2, "Player2");
+    //DisplayHand(&state, player1, "Player1");DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
     handPos = 0;
@@ -208,16 +180,6 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.discardCount[player2] == state.handCount[player2]), "Player 2 Discard Count == Original Hand Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.handCount[player2]);}
 
-
-    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
-    if(flagFail)
-    {
-        printf("--> *FAILED TEST 02 \n");
-/*      DisplayHand(&testState, player1, "\tCurrent");
-        DisplayDiscard(&testState, player1, "\tCurrent");
-        DisplayDeck(&testState, player1, "\tCurrent"); */
-    }
-
 /* -- TEST 3: choice2 & player2 Hand Count == 4 cards -- */
     printf("----- TEST 3: choice2 & player2 Hand Count == 4 cards -----\n");
     
@@ -226,8 +188,7 @@ int main(int argc, char** argv){
 
     state.hand[player1][0] = minion;
     SetUpHand(&state, player2, 4);
-    DisplayHand(&state, player1, "Player1");
-    DisplayHand(&state, player2, "Player2");
+    //DisplayHand(&state, player1, "Player1"); DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
     handPos = 0;
@@ -267,15 +228,6 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player 2 Discard Count == Original Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
 
-    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
-    if(flagFail)
-    {
-        printf("--> *FAILED TEST 03 \n");
-/*      DisplayHand(&testState, player1, "\tCurrent");
-        DisplayDiscard(&testState, player1, "\tCurrent");
-        DisplayDeck(&testState, player1, "\tCurrent"); */
-    }
-
 /* -- TEST 4: choice2 & player2 Hand Count < 4 cards -- */
     printf("----- TEST 4: choice2 & player2 Hand Count < 4 cards -----\n");
     
@@ -284,8 +236,7 @@ int main(int argc, char** argv){
 
     state.hand[player1][0] = minion;
     SetUpHand(&state, player2, 3);
-    DisplayHand(&state, player1, "Player1");
-    DisplayHand(&state, player2, "Player2");
+    //DisplayHand(&state, player1, "Player1"); DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
     handPos = 0;
@@ -325,26 +276,16 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player 2 Discard Count == Original Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
 
-    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
-    if(flagFail)
-    {
-        printf("--> *FAILED TEST 04 \n");
-/*      DisplayHand(&testState, player1, "\tCurrent");
-        DisplayDiscard(&testState, player1, "\tCurrent");
-        DisplayDeck(&testState, player1, "\tCurrent"); */
-    }
 
-
-/* -- TEST 5: choice2 & player1 Hand Count < 4 cards and player2 Hand Count > 4 cards -- */
-    printf("----- TEST 5: choice2 & player1 Hand Count < 4 cards and player2 hand count > 4 -----\n");
+/* -- TEST 5: choice2 & player1 Hand Count < 4 cards and player2 Hand Count == 4 cards -- */
+    printf("----- TEST 5: choice2 & player1 Hand Count < 4 cards and player2 hand count == 4 -----\n");
     
     // Set-up
     ResetGame(&state, num_players);
     SetUpHand(&state, player1, 3);
     state.hand[player1][0] = minion;
     SetUpHand(&state, player2, 4);
-    DisplayHand(&state, player1, "Player1");
-    DisplayHand(&state, player2, "Player2");
+    //DisplayHand(&state, player1, "Player1"); DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
     handPos = 0;
@@ -383,15 +324,6 @@ int main(int argc, char** argv){
     // Player 2 Discard Count Unchanged.
     assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player 2 Discard Count == Original Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
-
-    // IF FAILURE FLAG IS HIGH PRINT CARD PILES
-    if(flagFail)
-    {
-        printf("--> *FAILED TEST 05 \n");
-/*      DisplayHand(&testState, player1, "\tCurrent");
-        DisplayDiscard(&testState, player1, "\tCurrent");
-        DisplayDeck(&testState, player1, "\tCurrent"); */
-    }
 
 
   return 0;

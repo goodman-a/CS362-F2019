@@ -6,7 +6,8 @@
  * 
  * File: unittest3.c
  * 
- * File Description: Ambassador Card ...
+ * File Description: Unit Test for the Ambassador Card Function:
+ *   ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
  * 
  */
 
@@ -36,36 +37,6 @@ int AssertTest(int pass, char* msg)
     }
     
 }
-
-/* ambassadorCard Function General info*/
-
-/*
-int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state){
-
-    // check for return -1 or 0 with the ambassador_return parameter
-
-    // check choice2 is in the range of [0-2]
-    // check choice1 is not handpos (handpos == ambassador card)
-
-    //Check Supply Count has increased by choice2
-
-    //Check Opponents Hand Count has Increased by 1 (depending if enough cards to go around) 
-    // Check Opponents Hand Now Contain That Specific Card
-
-    // check supply count has changed by: SupplyCount = (SupplyCount + choice2 - numPlayers) while SupplyCount >=0 if supplycount+choice2-numplayers < 0 then supplycount = 0
-
-    //Hand Count decreases by choice2 + 1 (choice1)
-    //Discard Count increases by +1 (choice1)
-    //Trash Count increases by choice2
-
-
-    // NEED A SCENARIO FOR: number of players is greater than number of supply cards left. Nothing breaks, but should just not populate those players hands)
-
-
-
-*/
-
-
 
 /* -- Constants -- */
 // seed
@@ -97,10 +68,7 @@ int main(int argc, char** argv){
   int player3 = 2;
   int num_players = 2;
 
-  //int handNum_player1 = 5;
-  //int handNum_player2 = 5;
-
-  // Store return baron value ... kinda worthless here..
+  // Store return ambassador value
   int ambassador_return, assert_state;
   int flagFail = 0; 
 
@@ -109,12 +77,11 @@ int main(int argc, char** argv){
 
     /* __________ TESTING TIME __________ */
 
-    /* -- Test Overview -- */
     // Note: All Tests Need to Check for -1 return from ambassador_return meaning illegal/invalid move
-    // 1. choice2 is less than 0
-    // 2. choice2 is greater than 2
-    // 3. choice1 is equal to handpos (should be:handPos == ambassador card)
-    // 4. choice2 is > than number of selected card type in hand (BUG 01 HERE)
+    // 1. choice2 < 0
+    // 2. choice2 > 2
+    // 3. choice1 == handPos that holds the playing ambassador card
+    // 4. choice2 > choice count in hand (BUG 01 HERE)
     // 5. valid choice1 & choice2 w/ playerCount < supplyCount
     // 6. valid choice1 & choice 2 w/ playerCount > supplyCount
 
@@ -137,8 +104,7 @@ int main(int argc, char** argv){
     ResetGame(&state, num_players);
     SetUpHand(&state, player2, 4);
     state.hand[player1][handPos] = ambassador;
-    // DisplayHand(&state, player1, "Player1");
-    // DisplayHand(&state, player2, "Player2");
+    // DisplayHand(&state, player1, "Player1");DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
 
@@ -161,8 +127,7 @@ int main(int argc, char** argv){
     ResetGame(&state, num_players);
     SetUpHand(&state, player2, 4);
     state.hand[player1][handPos] = ambassador;
-    // DisplayHand(&state, player1, "Player1");
-    // DisplayHand(&state, player2, "Player2");
+    // DisplayHand(&state, player1, "Player1"); DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
 
@@ -185,8 +150,7 @@ int main(int argc, char** argv){
     ResetGame(&state, num_players);
     SetUpHand(&state, player2, 4);
     state.hand[player1][handPos] = ambassador;
-    // DisplayHand(&state, player1, "Player1");
-    // DisplayHand(&state, player2, "Player2");
+    // DisplayHand(&state, player1, "Player1"); DisplayHand(&state, player2, "Player2");
 
     memcpy(&testState, &state, sizeof(struct gameState));
 
@@ -211,9 +175,7 @@ int main(int argc, char** argv){
     state.hand[player1][handPos+1] = silver;  // make only 1 silver in hand, leaving 2 coppers
 
     memcpy(&testState, &state, sizeof(struct gameState));
-    DisplayHand(&testState, player1, "Player1");
-    DisplayHand(&testState, player2, "Player2");
-
+    //DisplayHand(&testState, player1, "Player1"); DisplayHand(&testState, player2, "Player2");
 
     ambassador_return = ambassadorCard(handPos,player1, choice1, choice2, &testState);
 
@@ -221,26 +183,31 @@ int main(int argc, char** argv){
     assert_state = AssertTest((ambassador_return == -1), "choice2 > choice1 count in hand");
     if(assert_state){flagFail = 1; printf("\tInvalid/Illegal input for choice2 not caught.\n"); 
         DisplayHand(&testState, player1, "\tPlayer1");
-        printf("choice1 in hand: %d vs. choice2: %d\n", HandCardCount(&testState, player1, copper), choice2);
+        printf("\tchoice1 in hand: %d vs. choice2: %d\n", HandCardCount(&testState, player1, copper), choice2);
     }
 
-    // Player 1 Hand Count Unchanged.
-    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]), "Player 1 Hand Count Unchanged");
+    // Player1: +0 Hand Count.
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]), "Player1: +0 Hand Count");
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]);}
 
-    // Player 2 Discard Count Unchanged.
-    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player 2 Discard Count Unchanged");
+    // Player1: +0 Discard Count.
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]), "Player1: +0 Discard Count");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]);}
+
+    // Player2: +0 Discard Count
+    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player2: +0 Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
 
     // check supply count is unchanged
+    assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Unchanged");
+    if(assert_state){flagFail = 1; printf("\tCopper Supply Count: Current= %d, Expected = %d\n", supplyCount(copper, &testState), supplyCount(copper, &state));}    
 
     // check trash count is unchanged
+    // Check that Trash Count +choice2
+    assert_state = AssertTest((testState.trashedCardCount == state.trashedCardCount), "Trashed Card Count +0");
+    if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state.trashedCardCount);}
 
-    //DisplayHand(&testState, player1, "Player1");
-    //DisplayHand(&testState, player2, "Player2");
-    //printf("choice1 in hand: %d vs. choice2: %d\n", HandCardCount(&testState, player1, copper), choice2);
-
-
+    //DisplayHand(&testState, player1, "Player1"); //DisplayHand(&testState, player2, "Player2");
 
 /* -- TEST 5: valid choice1 and choice2 w/ playerCount < supplyCount -- */
     printf("----- TEST 5: valid choice1 & choice2 w/ playerCount < supplyCount -----\n");
@@ -257,23 +224,24 @@ int main(int argc, char** argv){
     //state.hand[player1][handPos+1] = silver;  // make only 1 silver in hand, leaving 2 coppers
 
     memcpy(&testState, &state, sizeof(struct gameState));
-    DisplayHand(&testState, player1, "Player1");
-    DisplayHand(&testState, player2, "Player2");
-
+   // DisplayHand(&testState, player1, "Player1"); DisplayHand(&testState, player2, "Player2");
 
     ambassador_return = ambassadorCard(handPos,player1, choice1, choice2, &testState);
 
-
     // Player 1 Hand Count -3
-    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-3), "Player 1 Hand Count -3");
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-3), "Player1: -3 Hand Count");
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-3);}
 
     // Player 1 Hand Count -choice2 Copper
-    assert_state = AssertTest((HandCardCount(&testState, player1, copper) == HandCardCount(&state, player1, copper)-choice2), "Player 1 Copper Hand Count: -2 choice2");
+    assert_state = AssertTest((HandCardCount(&testState, player1, copper) == HandCardCount(&state, player1, copper)-choice2), "Player1:-2 Copper Hand Count");
     if(assert_state){flagFail = 1; printf("\tCopper Hand Count: Current = %d, Expected = %d\n", HandCardCount(&testState, player1, copper), HandCardCount(&state, player1, copper)-choice2);}
 
+    // Player1: +1 Discard Count Unchanged.
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "Player1: +1 Discard Count");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+1);}
+
     // Player 2 Discard Count +1. (gains copy of choice1)
-    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]+1), "Player 2 Discard Count Gain +1 Card");
+    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]+1), "Player2: +1 Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]+1);}
 
     // Check that Trash Count +choice2
@@ -281,11 +249,10 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state.trashedCardCount+choice2);}
 
     // Check choice1 supply = 
-    assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)+choice2-(num_players-1)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Has Changed");
+    assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)+choice2-(num_players-1)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Correctly Adjusted");
     if(assert_state){flagFail = 1; printf("\t Copper Supply Count: Current= %d, Expected = %d\n", supplyCount(copper, &testState), supplyCount(copper, &state)+choice2-(num_players-1));}    
 
-    DisplayHand(&state, player1, "Player1 (Starting)");
-    DisplayHand(&testState, player1, "Player1 (Ending)");
+    //DisplayHand(&state, player1, "Player1 (Starting)"); DisplayHand(&testState, player1, "Player1 (Ending)");
 
 
     /* -- TEST 6: valid choice1 & choice2 w/ playerCount > supplyCount -- */
@@ -305,27 +272,24 @@ int main(int argc, char** argv){
     state.supplyCount[curse] = 1;   // Set supply to 1 leaving not enough for all opponents.
 
     memcpy(&testState, &state, sizeof(struct gameState));
-    //DisplayHand(&testState, player1, "Player1");
-    //DisplayHand(&testState, player2, "Player2");
-    //DisplayHand(&testState, player3, "Player3");
+    //DisplayHand(&testState, player1, "Player1");DisplayHand(&testState, player2, "Player2");DisplayHand(&testState, player3, "Player3");
 
     ambassador_return = ambassadorCard(handPos,player1, choice1, choice2, &testState);
 
-
     // Player 1 Hand Count -1
-    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "Player 1 Hand Count -1");
+    assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "Player1: -1 Hand Count");
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state.handCount[player1]-1);}
 
-    // Player 1 Hand Count -choice2 Copper
-/*     assert_state = AssertTest((HandCardCount(&testState, player1, copper) == HandCardCount(&state, player1, copper)-choice2), "Player 1 Copper Hand Count: -2 choice2");
-    if(assert_state){flagFail = 1; printf("\tCopper Hand Count: Current = %d, Expected = %d\n", HandCardCount(&testState, player1, copper), HandCardCount(&state, player1, copper)-choice2);} */
+    // Player1: +1 Discard Count Unchanged.
+    assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "Player1: +1 Discard Count");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+1);}
 
     // Player 2 Discard Count +1. (gains copy of choice1)
-    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]+1), "Player 2 Discard Count Gain +1 Card");
+    assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]+1), "Player2: +1 Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]+1);}
 
     // Player 3 Discard Count Unchanged because choice1 supply ran out.
-    assert_state = AssertTest((testState.discardCount[player3] == state.discardCount[player3]), "Player 3 Discard Count Unchanged");
+    assert_state = AssertTest((testState.discardCount[player3] == state.discardCount[player3]), "Player3: +0 Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player3], state.discardCount[player3]);}
 
     // Check that Trash Count +choice2
@@ -333,32 +297,27 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state.trashedCardCount+choice2);}
 
     // Check curse supply equals 0 
-    assert_state = AssertTest((supplyCount(curse, &testState) == supplyCount(curse, &state)+choice2-(num_players-1)) ||(supplyCount(curse, &testState) == 0), "Curse Supply Count Has Changed");
+    assert_state = AssertTest((supplyCount(curse, &testState) == supplyCount(curse, &state)+choice2-(num_players-1)) ||(supplyCount(curse, &testState) == 0), "Curse Supply Count Correctly Adjusted");
     if(assert_state){flagFail = 1; printf("\t Curse Supply Count: Current= %d, Expected = %d\n", supplyCount(curse, &testState), 0);}    
 
-    DisplayHand(&state, player1, "Player1 (Starting)");
-    DisplayHand(&testState, player1, "Player1 (Ending)");
-
-
-
-
-
+   // DisplayHand(&state, player1, "Player1 (Starting)"); DisplayHand(&testState, player1, "Player1 (Ending)");
 
 
     /* FAILURE DETECTED - PRINT OUT HAND PILES */
-/*     if(flagFail)
+    if(flagFail)
     {
+        /*
         printf("---> *FAILURE DETECTED* <---\n");
         DisplayHand(&state, player1, "Player1 (Starting)");
         DisplayHand(&testState, player1, "Player1 (Ending)");
         DisplayHand(&state, player2, "Player2 (Starting)");
         DisplayHand(&testState, player2, "Player2 (Ending)");
-    } */
+        */
+    } 
 
 
   return 0;
 }
-
 
 
 /* -- Helper Functions -- */

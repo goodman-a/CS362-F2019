@@ -6,9 +6,8 @@
  * 
  * File: unittest5.c
  * 
- * File Description: Mine Card ...
- * 
- * 
+ * File Description: Unit Test for the Mine Card Function:
+ *   mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
  * 
  */
 
@@ -38,50 +37,6 @@ int AssertTest(int pass, char* msg)
     }
     
 }
-
-/* mineCard Function General info*/
-/*
-int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state){
-
-TEST 1: choice1 < copper (Invalid)
-TEST 2: choice1 > gold (Invalid)
-TEST 3: choice2 < copper (Invalid)
-TEST 4: choice2 > gold (Invalid)
-TEST 5: choice1_cost +3 < choice2_cost (Invalid)
-TEST 6: choice1_cost +3 == choice2_cost(Valid)
-TEST 7: choice1_cost + 3 > choice2_cost (Valid)
-TEST 6 & 7 Need to check for:
-	* Check Supply Count
-	* Check Hand Count with new card
-	* Check Hand Pile
-	* Check Discard Count
-	* Check Discard Pile
-	* Check Trash Pile
-	* Check Trash Count
-	*
-
-
-TEST 1: choice1 = copper-1 (return -1)
-TEST 2: choice1 = curse (smallest enum) (return -1)
-TEST 3: choice1 = gold+1 (return -1)
-TEST 4: choice1 = treasure_map  (largest enum) (return -1)
-
-REPEAT TEST 1-4 for choice2
-
-TEST 9: choice1 = copper & choice2 = gold  (return -1)
-TEST 10: choice1 = copper & choice2 = silver (return 0)
-TEST 11: choice1 = silver * choice2 = copper (return 0) 
-TEST 12: choice1 = copper & choice2 = copper (return 0)
-TEST SPECIAL CASE: Hand has 2+ cards of choice1 (current bug will remove all the cards matching...)
-
-TEST 10 & TEST 11:
-  * +1 discardCount --> mine
-  * +1 trashedCardCount --> choice1
-  * -1 handCount --> choice2 - mine - choice1
-  * -1 supplyCount[choice2] --> choice2 supply count goes down 1
-  * 
-
-*/
 
 
 /* -- Globals -- */
@@ -126,8 +81,19 @@ int main(int argc, char** argv){
 
   /* -- Test Overview -- */
   /* -- 
-      Note: 
-
+    1. choice1 < copper 
+    2. choice1 > gold 
+    3. choice1 = curse (edge case)
+    4. choice1 = treasure_map (edge case)
+    5. choice2 < copper
+    6. choice2 > gold
+    7. choice2 = curse (edge case)
+    8. choice2 = treasure_map (edge case)
+    9. choice1 = copper & choice2 = gold
+    10. choice1 = copper & choice2 = silver
+    11. choice1 = silver & choice2 = copper
+    12. choice1 = copper & choice2 = copper
+    13. Special Case: Hand has 2+ cards of choice1 (current bug will remove all the cards matching)
 
   -- */
 

@@ -66,7 +66,7 @@ int main(int argc, char** argv){
   int player2 = 1;
   int num_players = 2;
 
-  // Store return baron value ... kinda worthless here..
+  // Store minion return value 
   int minion_return, assert_state;
   int flagFail = 0; 
 

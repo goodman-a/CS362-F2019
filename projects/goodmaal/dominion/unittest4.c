@@ -6,7 +6,8 @@
  * 
  * File: unittest4.c
  * 
- * File Description: Tribute Card ...
+ * File Description: Unit Test for the Tribute Card Function:
+ *   tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
  * 
  * DOES NOT CHECK FOR CASES WHERE 3+ Rewards with cards having 2 types
  * 
@@ -39,95 +40,6 @@ int AssertTest(int pass, char* msg)
     
 }
 
-/* tributerCard Function General info*/
-/*
-int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus){
-
-  // if NextPlayer discard + deck count is <=1    (check discard and deck counts after entering this section)
-    // if deck > 0 
-        // reveal 1 card only and then discard 
-        *Check Discard Count +1
-        *Check Deck COunt -1
-        *Only 1 Revealed Card (tributeRevealedCards[0])
-        *Check the last card in players discard deck? --> state->discrd[nextPlayer][state-discardCount[nextPlayer]-1] ..
-
-    // else if discard > 0
-        // reveal 1 card only and then back to discard ... (deck is empty)
-        *check discard Count Unchanged
-        *Check discard pile id 1 and the card in there?
-
-    // else
-        // No Cards <-- Will only enter if no cards & then there is a worthless debug in there.
-
-  // else There is > 1 cards in discard and deck!
-    // if deckCount is empty then transfer discard pile to deck pile and then shuffle
-        // for-loop that transfers cards from discard to deck pile
-        //shuffle hand (BUG 01)
-        *deckCount == original discardCount
-        *discardCount == 0
-        *that the cards actually were shuffled... first display the original discard against the new deck, but will need to add a for loop to check with a flag passed in.
-    // store the top 2 cards in tributeRevealedCards[]
-    *verify tributeRevealedCards[] are the actual cards
-    *deckCount -2
-    *discardCount +2
-
-    // if the 2 cards that were on-top are the same set the second one to -1
-    *duplicate card is in trash pile
-    *trashedCardCount +1
-    *tributeRevealedCards[1] == -1
-
-    //for-loop through the two array positions in tributeRevealedCards[]
-        //if tributeRevealedCards[i] == treasure card 
-            // +2 bonus  (bonus issue?????)
-            *check that only treasure cards get the bonus
-            *check that only 2 treasure cards produce +4??
-        //else if tributeRevealedCards[i] == Victory Card
-            // Draw 2 Careds
-            *check that handCount +2
-            *check that deckCount -1
-        //else if tributeRevealedCards[i] == -1
-            // Nothing should happen, just if in debug print to screen.
-        //else (tribueRevealedCareds[i] == Action Card)
-            //numActions +2
-            *check numActions +2
-
-  // discard tribute card
-  *discardCount +1 (need to add all the others together)
-  *trashCount remains same unless during duplicate careds ...
-  *handCount -1
-  *card removed was actually the tribute card...
-
-
-*/
-
-
-/* Test Cases */
-
-  // TEST 01 -
-
-
-  // TEST ** - More than 3 revealed cards?
-
-  // TEST ** - Wrap Around Next Player?
-  
-  // TESTS:
-    //1. 1 in deck, 0 in discard -- reveal 1
-    //2. 0 in deck, 1 in discard -- reveal 1
-    //3. 0 in deck, 2+ in discard -- move, shuffle, reveal 2
-    //4. ***1 in deck, 1+ in discard -- shuffle, reveal, 1 from each? --> Chung Went #1047
-    //5. 0 in deck, 0 in discard -- reveal none
-    //6. 2+ in deck w/ 2*action cards revealed
-    //7. 2+ in deck w/ 1 action & 1 victory
-    //8. 2+ in deck w/ 1 vicotry & 1 estate
-    //9. 2+ in deck w/ 1 action & 1 estate
-    //10. 2+ in deck w/ card that has both action & victory along with an estate
-    //11. cna't hold three cards ....
-
-/* -- List of Bugs -- */
-  // Note: The code provided to the class had LOTS of bugs in this section. Most were fixed during refactoring, but I am sure some are lingering around
-  // Bug 01: Commented out shuffle in the primary else statement
-  // Bug 02: Commented out one of te draw card functions, so only drawing 1 instead of 2..
-
 
 /* -- Globals -- */
 // seed
@@ -149,6 +61,7 @@ int CheckShuffle(struct gameState *state_old, struct gameState *state_new, int p
 
 /* -- MAIN FUNCTION -- */
 int main(int argc, char** argv){
+
   /* -- Variables for Comparison, Checks, and Vericiations -- */
 
   // Passed in gameplay values
@@ -160,8 +73,6 @@ int main(int argc, char** argv){
   int num_players = 2;
   int tributeRevealedCards[2] = {-1, -1};
   int card1, card2;
-  //int handNum_player1 = 5;
-  //int handNum_player2 = 5;
 
   // Store return baron value ... kinda worthless here..
   int tribute_return, assert_state;
@@ -173,41 +84,19 @@ int main(int argc, char** argv){
     /* __________ TESTING TIME __________ */
 
   /* -- Test Overview -- */
-  /* -- 
-      Note: All Tests Need....
-      1. Discard + deck Count is <=1 (discard empty and deck == 1) and card is gold (treasure card)
-        a. Verify tributeRevealedCards[0] == gold and tributeRevealedCards[1] == -1
-        b. Player2: -1 deckCount & +1 discardCount
-        c. Player2: discard[discardCount-1] == gold
-        d. Player1: +2 bonus
-        e. Player1: +1 discardCount
-        f. Player1: +0 numActions
-        g. Player1: +0 handCount
-      2. Discard + Deck Count is <=1 (deck empty and discard ==1) and card is gold (treasure card) <-- maybe do victory card..
-        a. Verify tributeRevealedCards[0] == gold and tributeRevealedCards[1] == -1
-        b. Player2: +0 deckCount & +0 discardCount
-        c. Player2: discard[discardCount-1] == gold
-        d. Player1: +2 bonus
-        e. Player1: +1 discardCount
-        f. Player1: +0 numActions
-        g. Player1: +0 handCount
-      3. Discard + Deck Count is == 0 AND/OR -1
-        a. Verify tributeRevealedCards[0] == -1 and tributeRevealedCards[1] == -1
-        b. Player2: +0 deckCount & +0 discardCount
-        c. Player1: +1 discardCount
-        d. Player1: +0 bonus
-        e. Player1: +0 numActions
-        f. Player1: +0 handCount
-      4. Discard = 1+ & Deck = 1 (should reveal one for each....)
-        a. CheckShuffle  
-      4b. Discard = 2+ and Deck = 0
-      5. 2+ in Deck --> Action & Treasure (Minion & Gold)
-      6. 2+ in Deck --> Action & Victory (Minion & Gardens)
-      7. 2+ in Deck --> Treasure & Victory (Gold & Estate)
-      8. 2+ in Deck --> Treasure & Treasure (Gold & Gold) 
-        a. duplicate card is in trash pile, trashedCardCount +1, tributeRevealedCard[1] == -1 hmmm bug?
-      9. 2+ in Deck --> Treasure & Treasure (Gold & Silver)
-      10. REMEMBER THE CASE WHERE THERE ARE 3+ types and array can't hold...
+  /* --
+    //1. Deck Count == 1, Discard Count == 0 -- reveal 1
+    //2. Deck Count == 1, Discard Count == 1 -- reveal 1
+	//3. Deck Count == 0, Discard Count == 0
+	//4. Deck Count == 0, Discard Count >= 2
+	//5. Deck Count >= 2 (Action & Treasure)
+	//6. Deck Count >= 2 (Action & Victory)
+	//7. Deck Count >= 2 (Treasure & Victory)
+	//8. Deck Count >= 2 (Treasure & Treasure (same))
+	//9. Deck Count >= 2 (Treasure & Treasure(different))
+	//10. Special Case I: Deck Count == 0, Discard Count >= 5 --shuffle check
+	//11. Special Case II: Deck Count == 1, Discard Count >= 5
+	//Future Test: hold 3+ actions in tributeRevealedCards array.
   -- */
 
   /* -- List of Bugs -- */
@@ -215,9 +104,7 @@ int main(int argc, char** argv){
     Note: The code provided to the class had LOTS of bugs in this section. Most were fixed during refactoring, but I am sure some are lingering around
     Bug 01: Commented out shuffle in the primary else statement
     Bug 02: Commented out one of te draw card functions, so only drawing 1 instead of 2..
-    -- */
-
-
+  -- */
 
 
   printf("\n********** TRIBUTE CARD TEST **********\n");
@@ -281,6 +168,12 @@ int main(int argc, char** argv){
   // Player1: +1 Discard Count (Tribute Card)
   assert_state = AssertTest((testState.discardCount[player1] == state.discardCount[player1]+1), "Player1: +1 Discard Count (Tribute Card)");
   if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state.discardCount[player1]+1);}
+
+  if(flagFail)
+  {
+      //printf("FAILURE...\n");
+
+  }
 
 
 /* -- TEST 2: DiscardCount + DeckCount <=1 --> Discard=1 ; Deck = 0 -- */

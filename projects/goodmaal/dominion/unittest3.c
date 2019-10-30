@@ -180,10 +180,10 @@ int main(int argc, char** argv){
     ambassador_return = ambassadorCard(handPos,player1, choice1, choice2, &testState);
 
     // Check for -1 return when input is an illegal/invalid move (choice2 > choice1 count in hand)
-    assert_state = AssertTest((ambassador_return == -1), "choice2 > choice1 count in hand");
+    assert_state = AssertTest((ambassador_return == -1), "choice2 > choice1 count in hand (Invalid Move)");
     if(assert_state){flagFail = 1; printf("\tInvalid/Illegal input for choice2 not caught.\n"); 
-        DisplayHand(&testState, player1, "\tPlayer1");
-        printf("\tchoice1 in hand: %d vs. choice2: %d\n", HandCardCount(&testState, player1, copper), choice2);
+/*         DisplayHand(&testState, player1, "\tPlayer1");
+        printf("\tchoice1 in hand: %d vs. choice2: %d\n", HandCardCount(&testState, player1, copper), choice2); */
     }
 
     // Player1: +0 Hand Count.
@@ -198,9 +198,9 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.discardCount[player2] == state.discardCount[player2]), "Player2: +0 Discard Count");
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
 
-    // check supply count is unchanged
-    assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Unchanged");
-    if(assert_state){flagFail = 1; printf("\tCopper Supply Count: Current= %d, Expected = %d\n", supplyCount(copper, &testState), supplyCount(copper, &state));}    
+    // Check choice1 supply = 
+    assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Correctly Adjusted");
+    if(assert_state){flagFail = 1; printf("\t Copper Supply Count: Current= %d, Expected = %d\n", supplyCount(copper, &testState), supplyCount(copper, &state));}    
 
     // check trash count is unchanged
     // Check that Trash Count +choice2
@@ -248,7 +248,7 @@ int main(int argc, char** argv){
     assert_state = AssertTest((testState.trashedCardCount == state.trashedCardCount+choice2), "Trashed Card Count +choice2");
     if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state.trashedCardCount+choice2);}
 
-    // Check choice1 supply = 
+    // Check choice1 supply 
     assert_state = AssertTest((supplyCount(copper, &testState) == supplyCount(copper, &state)+choice2-(num_players-1)) ||(supplyCount(copper, &testState) == 0), "Copper Supply Count Correctly Adjusted");
     if(assert_state){flagFail = 1; printf("\t Copper Supply Count: Current= %d, Expected = %d\n", supplyCount(copper, &testState), supplyCount(copper, &state)+choice2-(num_players-1));}    
 

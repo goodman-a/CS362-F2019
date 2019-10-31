@@ -24,19 +24,71 @@ char inputChar()
     return randVal;
 }
 
+char RandomLetter()
+{
+   /*
+    // a = 81
+    // e = 127
+    // h = 61
+    // i = 70
+    // n = 67
+    // o = 75
+    // r = 60
+    // s = 63
+    // t = 90
+
+    */
+
+    // value combination a=[0-80], e=[81-207], t=[208-297], common=[298-697], uncommon[698-999]
+    char common[] = {'h', 'i', 'n', 'o', 'r', 's'};
+    char uncommon[] = {'b','c','d','f','g','j','k','l','m','p','q','u','v','w','x','y','z'};
+
+    int randomVal = (rand()%(1000-0))+0;
+    char c;
+
+    if(randomVal < 81)
+    {
+      c = 'a';
+    }
+    else if(randomVal >=81 && randomVal < 208)
+    {
+      c = 'e';
+    }
+    else if (randomVal >= 208 && randomVal < 298)
+    {
+      c = 't';
+    }
+    else if(randomVal >= 298 && randomVal < 698)
+    {
+      c = common[(rand()%(6-0))+0];
+    }
+    else
+    {
+      c = uncommon[(rand()%(17-0))+0] ; 
+    }
+
+    return c;
+
+}
+
 char *inputString()
 {
     // TODO: rewrite this function
     char randStr[6];
     int i = 0;
 
-    char vowels[] = {'a','e','i','o','u'};
-    randStr[0] = 'r';
+    //randStr[0] = 'r';
     //randStr[1] = 'e';
-    for(i=1; i<5; i++)
+    for(i=0; i<5; i++)
     {
-      //note: z=122, t=116, e=191, a=97 
-      randStr[i] = (rand()%(116-101+1))+101;
+      // Range that includes the lowest letter, c, and highest, t)
+      // note: z=122, t=116, e=191, a=97 
+      //randStr[i] = (rand()%(116-101+1))+101; 
+
+      // Using a Weighted Random Generator based off of frequency in the english language:
+      // source: https://en.wikipedia.org/wiki/Letter_frequency
+      randStr[i] = RandomLetter();
+
     }
 
     randStr[5] = '\0'; //null terminator

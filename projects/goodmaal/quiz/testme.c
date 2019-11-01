@@ -5,7 +5,7 @@
  * Due Date: 10 November 2019
  * 
  * file: testme.c
- * description: 
+ * description: Created a weighted random generator that hits the error condition 
  * 
  */ 
 
@@ -16,7 +16,6 @@
 
 char inputChar()
 {
-    // TODO: rewrite this function
     // ascii characters go from 32 (space) to 126 (~)
     int randVal = (rand()%(126-32+1))+32;
     //char randChar = randVal + '0';
@@ -24,22 +23,17 @@ char inputChar()
     return randVal;
 }
 
+
+// Helper Function for inputString that returns a weighted random character based off its frequnecy of use.
+// source of weights: https://en.wikipedia.org/wiki/Letter_frequency
 char RandomLetter()
 {
    /*
-    // a = 81
-    // e = 127
-    // h = 61
-    // i = 70
-    // n = 67
-    // o = 75
-    // r = 60
-    // s = 63
-    // t = 90
+    // Letter Frequency (Most Common):
+    // a = 81, e = 127, h = 61, i = 70, n = 67, o = 75, r = 60, s = 63, t = 90
+   */
 
-    */
-
-    // value combination a=[0-80], e=[81-207], t=[208-297], common=[298-697], uncommon[698-999]
+    // value combination: a=[0-80], e=[81-207], t=[208-297], common=[298-697], uncommon[698-999]
     char common[] = {'h', 'i', 'n', 'o', 'r', 's'};
     char uncommon[] = {'b','c','d','f','g','j','k','l','m','p','q','u','v','w','x','y','z'};
 
@@ -73,7 +67,6 @@ char RandomLetter()
 
 char *inputString()
 {
-    // TODO: rewrite this function
     char randStr[6];
     int i = 0;
 
@@ -81,25 +74,20 @@ char *inputString()
     //randStr[1] = 'e';
     for(i=0; i<5; i++)
     {
+      /* Option 1: Random Generator only using range of */
       // Range that includes the lowest letter, c, and highest, t)
-      // note: z=122, t=116, e=191, a=97 
+      // note: [a-z] = [97 -122] ; "reset" range [e-t] = [101 - 116]
       //randStr[i] = (rand()%(116-101+1))+101; 
 
-      // Using a Weighted Random Generator based off of frequency in the english language:
-      // source: https://en.wikipedia.org/wiki/Letter_frequency
+      /* -- Option 2: Weighted Random Genartor -- */
+      // Weighted Random Generator based off of frequency of use in the english language
       randStr[i] = RandomLetter();
-
     }
 
-    randStr[5] = '\0'; //null terminator
+    randStr[5] = '\0'; //null terminated
   
     // Store Random String
-    char* randomstring;
-    randomstring = randStr;
- 
-    // Store Set String -- allows to hit condition
-    //char* randomstring = "reset";
-
+    char* randomstring = randStr;
   
    return randomstring;
 }
@@ -115,7 +103,7 @@ void testme()
     tcCount++;
     c = inputChar();
     s = inputString();
-    //state = 9;
+
     printf("Iteration %d: c = %c, s = %s, state = %d\n", tcCount, c, s, state);
     if (c == '[' && state == 0) state = 1;
     if (c == '(' && state == 1) state = 2;

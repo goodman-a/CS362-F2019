@@ -710,7 +710,6 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                     }
                     if (supplyCount(estate, state) > 0) { 
                         gainCard(estate, state, 2, currentPlayer); // @Baron Bug 01 - Changed the toFlag to 2 (add to hand) from 0 (add to discard)
-
                         // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                         //state->supplyCount[estate]--;//Decrement estates
                         if (supplyCount(estate, state) == 0) {

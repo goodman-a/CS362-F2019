@@ -127,7 +127,7 @@ int main(int argc, char** argv){
 
     // Randomize hand size & Position 
     int hand_size = rand()% 10; //MAX_HAND;
-    handPos = rand()%(hand_size+1)-1;
+    handPos = rand()%(hand_size+1);
 
     // set game state (hand count, random generated hand, and place of playing card (baron))
     state.handCount[player] = hand_size;

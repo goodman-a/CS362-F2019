@@ -91,10 +91,10 @@ int main(int argc, char** argv){
   int i, j, r;
 
   // gameplay values
-  int handPos = 0, choice1 = 0, num_bys = 0, bonus = 0, bonus_start = 0;
+  int handPos = 0, choice1 = 0, num_buys = 0, bonus = 0, bonus_start = 0;
   
   // setup/initialize parameters
-  srand(time(NULL));
+  srand(time(0));
 
   int seed = rand();
   int player = 0;
@@ -122,15 +122,18 @@ int main(int argc, char** argv){
 
     // randomize number of playes: 2 to 4 playes 
     num_players = (rand()%(4-2+1))+2;
-
+    
     // Initialize Game
     initializeGame(num_players, k, seed, &state);
 
     // Randomize hand size, position, choice1 
-    int hand_size = (rand()% 10)+1; //can't be empty ...
-    handPos = (rand()%(hand_size));
-    choice1 = (rand() % 2);
-
+    int hand_size = (rand()%10)+2; //can't be empty ...
+    //int hand_size = 2;
+    if(hand_size == 1){handPos = 0;}
+    else{handPos = (rand()%hand_size);}
+    //handPos = 0;
+    choice1 = (rand()%2);
+    
     // set game state (hand count, random generated hand, and place of playing card (baron))
     state.handCount[player] = hand_size;
     HandGenerator(&state, player, hand_size, 0, treasure_map);
@@ -140,34 +143,25 @@ int main(int argc, char** argv){
     // Randomize Estate Supply Count
     int estate_count = state.supplyCount[estate];
     state.supplyCount[estate] = rand()%(estate_count+1);  // may need to weight the zero value higher ...
-    //estate_count = state.supplyCount[estate];
-
-    // Display All Randomly Generated Stuffss....
-    
-    /*
-    printf("Number of Players: %d\n", num_players);
-    printf("Hand Size: %d & Hand Pos: %d\n", hand_size, handPos);
-    DisplayHand(&state, player, "Player1");
-    int hand_estate = HandCardCount(&state, player, estate);
-    printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
-    */
+    //estate_count = state.supplyCount[estate];    
 
     // call BaronTest and record if test was success or failure.. update stats.
     int barontest = BaronTest(&state, player, handPos, choice1);
+
     if(barontest){
+        printf("FAIL----\n");
         printf("Number of Players: %d\n", num_players);
-        printf("Hand Size: %d & Hand Pos: %d\n", hand_size, handPos);
+        printf("Hand Size: %d & Hand Pos: %d\n", state.handCount[player], handPos);
         //printf("Number of Buys: %d\n", state.numBuys);
         printf("Choice: %d\n",choice1);
-        //DisplayHand(&state, player, "Player1");
+        DisplayHand(&state, player, "Player1");
         int hand_estate = HandCardCount(&state, player, estate);
-        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
+        printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
         counter_failure++;}
     else{counter_success++;}
 
     // reset the state
-   memset(&state, 0, sizeof(struct gameState));   // clear the game state
-
+   //memset(&state, 0, sizeof(struct gameState));   // clear the game state
   } // end of primary for-loop
   printf("Successful:%d  vs. Failures:%d\n", counter_success, counter_failure);  
  
@@ -189,8 +183,6 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
   int bonus_start = 0;
   int flagFail = 0;
   int assert_state, baron_return;
-
-  //printf("BEFORE - Number of Buys: Test = %d vs. Original = %d\n", testState.numBuys, state->numBuys);
 
   // call baron function ...
   baron_return = baronCard(handPos, choice1, player, &testState, &bonus);

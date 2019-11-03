@@ -32,7 +32,7 @@ int AssertTest(int pass, char* msg)
     else
     {
         // OR NOT SAY ANYTHING?
-        printf("PASS: %s\n", msg);
+        //printf("PASS: %s\n", msg);
         return 0;
     }
     
@@ -78,6 +78,7 @@ void DisplayDiscard(struct gameState *state, int player, char* msg);
 void DisplayDeck(struct gameState *state, int player, char* msg);
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
+int BaronTest(struct gameState *state, int player, int handPos, int choice1);
 
 
 
@@ -100,7 +101,7 @@ int main(int argc, char** argv){
   int num_players, num_hand;
   
   // Counters
-  //int counter_success, counter_failure;
+  int counter_success=0, counter_failure=0;
   int count_tests = 500;
 
   // Kingdom Cards
@@ -114,8 +115,8 @@ int main(int argc, char** argv){
   /* -- Run count_tests number of tests -- */
   for(i=0; i<count_tests; i++)
   {
-
-    printf("TEST #%d\n",i+1);
+    //printf("TEST #%d\n",i+1);
+   
     // fail flag
     int failFlag = 0;
 
@@ -125,9 +126,10 @@ int main(int argc, char** argv){
     // Initialize Game
     initializeGame(num_players, k, seed, &state);
 
-    // Randomize hand size & Position 
-    int hand_size = rand()% 10; //MAX_HAND;
-    handPos = rand()%(hand_size+1);
+    // Randomize hand size, position, choice1 
+    int hand_size = (rand()% 10)+1; //can't be empty ...
+    handPos = (rand()%(hand_size));
+    choice1 = (rand() % 2);
 
     // set game state (hand count, random generated hand, and place of playing card (baron))
     state.handCount[player] = hand_size;
@@ -142,23 +144,77 @@ int main(int argc, char** argv){
 
     // Display All Randomly Generated Stuffss....
     
+    /*
     printf("Number of Players: %d\n", num_players);
     printf("Hand Size: %d & Hand Pos: %d\n", hand_size, handPos);
     DisplayHand(&state, player, "Player1");
     int hand_estate = HandCardCount(&state, player, estate);
     printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
-  
+    */
+
+    // call BaronTest and record if test was success or failure.. update stats.
+    int barontest = BaronTest(&state, player, handPos, choice1);
+    if(barontest){
+        printf("Number of Players: %d\n", num_players);
+        printf("Hand Size: %d & Hand Pos: %d\n", hand_size, handPos);
+        //printf("Number of Buys: %d\n", state.numBuys);
+        printf("Choice: %d\n",choice1);
+        //DisplayHand(&state, player, "Player1");
+        int hand_estate = HandCardCount(&state, player, estate);
+        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
+        counter_failure++;}
+    else{counter_success++;}
 
     // reset the state
    memset(&state, 0, sizeof(struct gameState));   // clear the game state
 
   } // end of primary for-loop
-  
+  printf("Successful:%d  vs. Failures:%d\n", counter_success, counter_failure);  
  
   return 0;
 
 }
 
+
+
+
+
+
+int BaronTest(struct gameState *state, int player, int handPos, int choice1)
+{
+  struct gameState testState;
+  memcpy(&testState, state, sizeof(struct gameState));
+
+  int bonus = 0;
+  int bonus_start = 0;
+  int flagFail = 0;
+  int assert_state, baron_return;
+
+  //printf("BEFORE - Number of Buys: Test = %d vs. Original = %d\n", testState.numBuys, state->numBuys);
+
+  // call baron function ...
+  baron_return = baronCard(handPos, choice1, player, &testState, &bonus);
+  if(baron_return != 0){printf("Baron Failed Execution\n");}
+  
+  // check action
+  assert_state = AssertTest((testState.numBuys == state->numBuys+1), "+1 Number of Buys");
+  if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state->numBuys +1); return flagFail;}
+
+  if(choice1 < 0)
+  {
+
+  }
+
+  else
+  {
+      
+  }
+  
+
+
+
+  return flagFail;
+}
 
 /* -- Helper Functions -- */
 

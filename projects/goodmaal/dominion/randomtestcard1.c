@@ -40,37 +40,6 @@ int AssertTest(int pass, char* msg)
 
 
 
-/* -- What to look for each iteration -- */
-/*
-  1. +1 buy everytime
-  2. bonus value
-  3. discard value
-  4. hand count
-  5. number of estates in hand
-  6. estate supply count  (set up a large  number or a predefined array, but need it check 0 and 1 more often ....)
-  7. 
-
-
-
-*/
-
-
-// Hmmm What to randomize?
-/*
-  1. If to discard an estate or not (a 0 or 1 rand value)
-  2. What is in the player's hand ...
-  3. Supply Count ..
-
-
-
-
-
-
-
-*/
-
-
-
 /* -- Helper Function Prototypes -- */
 void HandGenerator(struct gameState *state, int player, int size, int min, int max);
 void DisplayHand(struct gameState *state, int player, char* msg);
@@ -79,8 +48,6 @@ void DisplayDeck(struct gameState *state, int player, char* msg);
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
 int BaronTest(struct gameState *state, int player, int handPos, int choice1);
-
-
 
 
 /* -- MAIN FUNCTION -- */
@@ -156,13 +123,13 @@ int main(int argc, char** argv){
         //printf("Choice: %d\n",choice1);
         //DisplayHand(&state, player, "Player1");
         //int hand_estate = HandCardCount(&state, player, estate);
-        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d vs. Original Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate], estate_count);
+        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate]);
         counter_failure++;}
     else{counter_success++;}
 
-    // reset the state
-   //memset(&state, 0, sizeof(struct gameState));   // clear the game state
   } // end of primary for-loop
+
+  // Result Summary
   printf("Successful:%d  vs. Failures:%d\n", counter_success, counter_failure);  
  
   return 0;
@@ -170,15 +137,14 @@ int main(int argc, char** argv){
 }
 
 
-
-
-
-
+// Baron Random Test (player choice dependent)
 int BaronTest(struct gameState *state, int player, int handPos, int choice1)
 {
+  // Set-up test game state
   struct gameState testState;
   memcpy(&testState, state, sizeof(struct gameState));
 
+  // Variables
   int bonus = 0;
   int bonus_start = 0;
   int flagFail = 0;
@@ -202,15 +168,24 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
         if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
 
         // -2 Hand Count
-        assert_state = AssertTest((testState.handCount[player] == state->handCount[player]-2), "-2 Hand Count (Estate & Baron Discarded)");
+        assert_state = AssertTest((testState.handCount[player] == state->handCount[player]-2), "-2 Hand Count (Estate & Baron)");
         if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player], state->handCount[player]-2);}
 
-        // Estate Hand Count
+        // +2 Discard Count
+        assert_state = AssertTest((testState.discardCount[player] == state->discardCount[player]+2), "+2 Discard Count (Estate & Baron)");
+        if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player], state->discardCount[player]+2);} 
+        
+        // -1 Estate Hand Count
+        assert_state = AssertTest((HandCardCount(&testState, player, estate) == HandCardCount(state, player, estate)-1), "-1 Estate Hand Count");
+        if(assert_state){flagFail = 1; printf("\tCopper Hand Count: Current = %d, Expected = %d\n", HandCardCount(&testState, player, estate), HandCardCount(state, player, estate)-1);}
 
-        // Discard Count
+        // +0 Estate Supply Count
+        assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)), "+0 Estate Supply Count");
+        if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state));}    
+ 
+        // +0 Trash Count?
 
-        // Estate Supply Count
-
+        // +0 Deck Count?
 
       }
 
@@ -227,35 +202,75 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
         assert_state = AssertTest((testState.handCount[player] == state->handCount[player]-1), "-1 Hand Count (Baron Discarded)");
         if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player], state->handCount[player]-1);}
 
-        // Estate Hand Count
+        // +0 Estate Hand Count
+        assert_state = AssertTest((HandCardCount(&testState, player, estate) == HandCardCount(state, player, estate)), "+0 Estate Hand Count");
+        if(assert_state){flagFail = 1; printf("\tCopper Hand Count: Current = %d, Expected = %d\n", HandCardCount(&testState, player, estate), HandCardCount(state, player, estate));}
 
-        // Discard Count
+        // +0 Trash Count?
 
-        // Estate Supply Count   
+        // +0 Deck Count?
 
+        // Estate Supply Count is Empty
+        if(testState.supplyCount[estate] <=0  && state->supplyCount[estate] == 0) 
+        {
+          // +1 Discard Count
+          assert_state = AssertTest((testState.discardCount[player] == state->discardCount[player]+1), "+1 Discard Count (Baron)");
+          if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player], state->discardCount[player]+1);}
+
+          // +0 Estate Supply Count
+          assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)), "+0 Estate Supply Count");
+          if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state));}    
+        }
+        else
+        {
+          // +2 Discard Count
+          assert_state = AssertTest((testState.discardCount[player] == state->discardCount[player]+2), "+2 Discard Count (Estate & Baron)");
+          if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player], state->discardCount[player]+2);} 
+
+          // -1 Estate Supply Count
+          assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)-1), "-1 Estate Supply Count");
+          if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state)-1);}    
+
+        }
 
       }
       
-
-
 
   }
 
   else
   {
-      
+    // Estate Supply Count is Empty
+    if(testState.supplyCount[estate] <=0  && state->supplyCount[estate] == 0) 
+    {
+      // +1 Discard Count
+      assert_state = AssertTest((testState.discardCount[player] == state->discardCount[player]+1), "+1 Discard Count (Baron)");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player], state->discardCount[player]+1);}
+
+      // +0 Estate Supply Count
+      assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)), "+0 Estate Supply Count");
+      if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state));}    
+    }
+    else
+    {
+      // +2 Discard Count
+      assert_state = AssertTest((testState.discardCount[player] == state->discardCount[player]+2), "+2 Discard Count (Estate & Baron)");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player], state->discardCount[player]+2);} 
+
+      // -1 Estate Supply Count
+      assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)-1), "-1 Estate Supply Count");
+      if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state)-1);}    
+
+    }
+
   }
   
-
-
-
   return flagFail;
 }
 
 /* -- Helper Functions -- */
 
 // Random Hand Generator 
-
 void HandGenerator(struct gameState *state, int player, int size, int min, int max)
 {
   int i;

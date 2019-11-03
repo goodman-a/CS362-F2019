@@ -704,23 +704,6 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                 // added this to fix a current bug in the program when there is only 1 card in the hand.
                 if(p >= state->handCount[currentPlayer])
                 {
-                    card_not_discarded = 0;
-                }
-
-               else if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
-                   // state->coins += 4;//Add 4 coins to the amount of coins
-                    *bonus = 4; // Piazza Post - adams Rosales
-
-                    state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
-                    state->discardCount[currentPlayer]++;
-                    for (; p < state->handCount[currentPlayer]; p++) {
-                        state->hand[currentPlayer][p] = state->hand[currentPlayer][p+1];
-                    }
-                    state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
-                    state->handCount[currentPlayer]--;
-                    card_not_discarded = 0;//Exit the loop
-                }
-                else if (p > state->handCount[currentPlayer]) {
                     if(DEBUG) {
                         printf("No estate cards in your hand, invalid choice\n");
                         printf("Must gain an estate if there are any\n");
@@ -734,6 +717,20 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                             isGameOver(state);
                         }
                     }
+                    card_not_discarded = 0;//Exit the loop
+                }
+
+               else if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
+                   // state->coins += 4;//Add 4 coins to the amount of coins
+                    *bonus = 4; // Piazza Post - adams Rosales
+
+                    state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
+                    state->discardCount[currentPlayer]++;
+                    for (; p < state->handCount[currentPlayer]; p++) {
+                        state->hand[currentPlayer][p] = state->hand[currentPlayer][p+1];
+                    }
+                    state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
+                    state->handCount[currentPlayer]--;
                     card_not_discarded = 0;//Exit the loop
                 }
 

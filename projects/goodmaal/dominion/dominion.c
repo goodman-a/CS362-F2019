@@ -701,7 +701,13 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
             int p = 0;//Iterator for hand!
             int card_not_discarded = 1;//Flag for discard set!
             while(card_not_discarded) {
-                if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
+                // added this to fix a current bug in the program when there is only 1 card in the hand.
+                if(p >= state->handCount[currentPlayer])
+                {
+                    card_not_discarded = 0;
+                }
+
+               else if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
                    // state->coins += 4;//Add 4 coins to the amount of coins
                     *bonus = 4; // Piazza Post - adams Rosales
 

@@ -127,8 +127,8 @@ int main(int argc, char** argv){
     initializeGame(num_players, k, seed, &state);
 
     // Randomize hand size, position, choice1 
-    int hand_size = (rand()%10)+2; //can't be empty ...
-    //int hand_size = 2;
+    int hand_size = (rand()%10)+1; 
+    //int hand_size = 1;
     if(hand_size == 1){handPos = 0;}
     else{handPos = (rand()%hand_size);}
     //handPos = 0;

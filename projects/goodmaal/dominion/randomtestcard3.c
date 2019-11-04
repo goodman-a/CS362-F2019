@@ -84,7 +84,7 @@ int main(int argc, char** argv){
   /* -- Run count_tests number of tests -- */
   for(i=0; i<count_tests; i++)
   {
-    //printf("TEST #%d\n",i+1);
+    printf("TEST #%d\n",i+1);
    
     // randomize number of playes: 2 to 4 players 
     num_players = (rand()%(4-2+1))+2;
@@ -109,12 +109,11 @@ int main(int argc, char** argv){
         }
         
     }
+    
 /* -- TEST CHECKS -- */
-/*
+
     // Number of Players:
     printf("Number of Players: %d\n",num_players);
-    printf("Choice1: %d\n",choice1);
-    printf("Choice2: %d\n",choice2);
 
     // Display Each Player's Hand
     for(r=0 ; r<num_players; r++)
@@ -122,7 +121,11 @@ int main(int argc, char** argv){
       DisplayHand(&state, r, "Player");
     }
 
-*/
+    for(r=0 ; r<num_players; r++)
+    {
+      DisplayDeck(&state, r, "Player");
+    }
+
 /* -- END OF TEST CHECKS -- */
 
     // call TributeTest and record if test was success or failure.. update stats.
@@ -148,6 +151,9 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   int flagFail = 0;
   int bonus = 0;
   int bonus_start = 0;
+  int bonus_count = 0;
+  int hand_count = 0;
+  int action_count = 0;
   int assert_state, tribute_return = -1;
   int z;
   int tributeRevealedCards[2] = {-1, -1};
@@ -213,21 +219,46 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
 
 
   /* - Player1 Stats: - */
+  // Count/Tally Rewards Earned
+  for(z=0; z<2; z++)
+  {
+    // Treasure Card
+    if(tributeRevealedCards[z] == copper || tributeRevealedCards[z] == silver || tributeRevealedCards[z] == gold )
+    {
+        bonus_count += 2;
+    }
+    // Victory Card
+    else if(tributeRevealedCards[z] == estate || tributeRevealedCards[z] == duchy || tributeRevealedCards[z] == province || tributeRevealedCards[z] == gardens || tributeRevealedCards[z] == great_hall)
+    {
+        hand_count += 2;
+    }
+
+    else if(tributeRevealedCards[z] == -1)
+    {
+        //Nothing
+    }
+    else
+    {
+        action_count += 2;
+    }
+    
+  }
+
+ // Player1: Bonus Count
+  assert_state = AssertTest((bonus == bonus_start+bonus_count), "Player1: Bonus Count");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+bonus_count);}
+
+  // Player1: Action Count 
+  assert_state = AssertTest((testState.numActions == state->numActions+action_count), "Player1: Action Count");
+  if(assert_state){flagFail = 1; printf("\tAction Count: Current = %d vs. Expected = %d\n", testState.numActions, state->numActions+action_count); }
+
+  // Player1: Hand Count
+  assert_state = AssertTest((testState.handCount[player1] == state->handCount[player1]-1+hand_count), "Player1: Hand Count");
+  if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state->handCount[player1]-1+hand_count);}
 
   // +1 Discard Count
-  assert_state = AssertTest((testState.discardCount[player1] == state->discardCount[player1]+1), "Player1: +1 Discard Count (Tribute Card)");
+  assert_state = AssertTest((testState.discardCount[player1] == state->discardCount[player1]+1), "Player1: Discard Count");
   if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state->discardCount[player1]+1);}
-
-  // if revealed card is Treasure: +2 bonus
-
-  // else if revealed card is Victory: Draw 2
-
-  // else if revealed card is -1: NOTHING
-
-  // else: +2 action 
-
-
-
 
 
   return flagFail;

@@ -6,7 +6,7 @@
  * 
  * File: randomtestcard2.c
  * 
- * File Description: Random Tester for the Baron Card Function:
+ * File Description: Random Tester for the Minion Card Function:
  *  minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus);
  * 
  */
@@ -65,9 +65,6 @@ int main(int argc, char** argv){
 
   int seed = rand();
   int player1 = 0;
-  //int player2 = 1;
-  //int player3 = 2;
-  //int player4 = 3;
   int num_players;
   
   // Counters
@@ -136,17 +133,7 @@ int main(int argc, char** argv){
     // call MinionTest and record if test was success or failure.. update stats.
     miniontest = MinionTest(&state, player1, handPos, choice1, choice2, num_players);
 
-    if(miniontest){
-        //printf("FAIL----\n");
-        //printf("Number of Players: %d\n", num_players);
-        //printf("Hand Size: %d & Hand Pos: %d\n", state.handCount[player], handPos);
-        //printf("Number of Buys: %d\n", state.numBuys);
-        //printf("Choice: %d\n",choice1);
-        //DisplayHand(&state, player, "Player1");
-        //int hand_estate = HandCardCount(&state, player, estate);
-        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate]);
-        counter_failure++;
-    }
+    if(miniontest){counter_failure++;}
     else{counter_success++;}
 
   } // end of primary for-loop
@@ -243,8 +230,6 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
     }
 
   }
-
-
 
 
   return flagFail;

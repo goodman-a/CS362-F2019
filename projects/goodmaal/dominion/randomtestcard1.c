@@ -55,17 +55,17 @@ int main(int argc, char** argv){
   /* -- Variables for Comparison, Checks, and Vericiations -- */
 
   // general iterators
-  int i, j, r;
+  int i;
 
   // gameplay values
-  int handPos = 0, choice1 = 0, num_buys = 0, bonus = 0, bonus_start = 0;
+  int handPos = 0, choice1 = 0;
   
   // setup/initialize parameters
   srand(time(0));
 
   int seed = rand();
   int player = 0;
-  int num_players, num_hand;
+  int num_players;
   
   // Counters
   int counter_success=0, counter_failure=0;
@@ -83,9 +83,7 @@ int main(int argc, char** argv){
   for(i=0; i<count_tests; i++)
   {
     //printf("TEST #%d\n",i+1);
-   
-    // fail flag
-    int failFlag = 0;
+
 
     // randomize number of playes: 2 to 4 playes 
     num_players = (rand()%(4-2+1))+2;
@@ -105,7 +103,6 @@ int main(int argc, char** argv){
     state.handCount[player] = hand_size;
     HandGenerator(&state, player, hand_size, 0, treasure_map);
     state.hand[player][handPos] = baron; 
-    bonus = 0; // reset bonus
 
     // Randomize Estate Supply Count
     int estate_count = state.supplyCount[estate];

@@ -919,65 +919,64 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
         }
 
     else {
-            if (state->deckCount[nextPlayer] == 0) {     
-                int count_discard = state->discardCount[nextPlayer];  
-                for (i = 0; i < count_discard; i++) {
-                    state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
-                    state->deckCount[nextPlayer]++;
-                    state->discard[nextPlayer][i] = -1;
-                    state->discardCount[nextPlayer]--;
-                }
-                // @Tribute Bug 01 - Commented out shuffle
-                //shuffle(nextPlayer,state);//Shuffle the deck
+        if (state->deckCount[nextPlayer] == 0) {     
+            int count_discard = state->discardCount[nextPlayer];  
+            for (i = 0; i < count_discard; i++) {
+                state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
+                state->deckCount[nextPlayer]++;
+                state->discard[nextPlayer][i] = -1;
+                state->discardCount[nextPlayer]--;
             }
-            tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post - Brian Terrell
-            state->discardCount[nextPlayer]++;
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+            // @Tribute Bug 01 - Commented out shuffle
+            //shuffle(nextPlayer,state);//Shuffle the deck
+        }
+        tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        // Piazza Post - Brian Terrell
+        state->discardCount[nextPlayer]++;
+        state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
-            state->deckCount[nextPlayer]--;
+        state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
+        state->deckCount[nextPlayer]--;
 
-            tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post - Brian Terrell
-            state->discardCount[nextPlayer]++;
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        // Piazza Post - Brian Terrell
+        state->discardCount[nextPlayer]++;
+        state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
-            state->deckCount[nextPlayer]--;
+        state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
+        state->deckCount[nextPlayer]--;
     }
 
-        if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
-            state->trash[state->trashedCardCount] = tributeRevealedCards[1];
-            state->trashedCardCount++;
-            tributeRevealedCards[1] = -1;
+    if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
+        state->trash[state->trashedCardCount] = tributeRevealedCards[1];
+        state->trashedCardCount++;
+        tributeRevealedCards[1] = -1;
+    }
+
+    for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
+        if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
+            // Piazza Post - Adams Rosales
+            //state->coins += 2;
+            *bonus += 2;
         }
 
-        for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
-            if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
-                // Piazza Post - Adams Rosales
-                //state->coins += 2;
-                *bonus += 2;
-            }
-
-            else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
-                //drawCard(currentPlayer, state); // @Tribute Bug 02 - Commented out one of the drawCard functions 
-                drawCard(currentPlayer, state);
-            }
-            // Piazza Post - Mandi Grant
-            else if (tributeRevealedCards[i] == -1){
-                if (DEBUG){
-                    printf("Both revealed cards are the same");
-                }
-            } else { //Action Card
-                state->numActions = state->numActions + 2;
-            }
+        else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
+            //drawCard(currentPlayer, state); // @Tribute Bug 02 - Commented out one of the drawCard functions 
+            drawCard(currentPlayer, state);
         }
+        // Piazza Post - Mandi Grant
+        else if (tributeRevealedCards[i] == -1){
+            if (DEBUG){
+                printf("Both revealed cards are the same");
+            }
+        } else { //Action Card
+            state->numActions = state->numActions + 2;
+        }
+    }
 
-        discardCard(handPos, currentPlayer, state, 0); // Piazza Post - Robert Saraceno
+    discardCard(handPos, currentPlayer, state, 0); // Piazza Post - Robert Saraceno
 
-        return 0;
-
+    return 0;
 
 }
 

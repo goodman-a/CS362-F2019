@@ -42,6 +42,8 @@ int AssertTest(int pass, char* msg)
 
 /* -- Helper Function Prototypes -- */
 void HandGenerator(struct gameState *state, int player, int size, int min, int max);
+void DiscardGenerator(struct gameState *state, int player, int size, int min, int max);
+void DeckGenerator(struct gameState *state, int player, int size, int min, int max);
 void DisplayHand(struct gameState *state, int player, char* msg);
 void DisplayDiscard(struct gameState *state, int player, char* msg);
 void DisplayDeck(struct gameState *state, int player, char* msg);
@@ -68,10 +70,13 @@ int main(int argc, char** argv){
   int player1 = 0;
   int player2 = 1;
   int num_players;
+  int maxHand = 10;
+  int maxDiscard = 20;
+  int maxDeck = 30;
   
   // Counters
   int counter_success=0, counter_failure=0, tributetest = 0;
-  int count_tests = 5;
+  int count_tests = 5000;
 
   // Kingdom Cards
   int k[10] = {adventurer, council_room, tribute, gardens, mine, remodel, smithy, village, baron, great_hall};
@@ -83,9 +88,7 @@ int main(int argc, char** argv){
 
   /* -- Run count_tests number of tests -- */
   for(i=0; i<count_tests; i++)
-  {
-    printf("TEST #%d\n",i+1);
-   
+  {   
     // randomize number of playes: 2 to 4 players 
     num_players = (rand()%(4-2+1))+2;
     
@@ -95,9 +98,9 @@ int main(int argc, char** argv){
     // set game state for each player (hand count, random generated hand, and place of playing card (baron))
     for(j=0; j<num_players; j++)
     {
-        state.handCount[j] = (rand()%10)+1;
         if(j == 0)
         {
+          state.handCount[j] = (rand()%maxHand)+1;
           if(state.handCount[j] == 1){handPos=0;}
           else{handPos = (rand()%state.handCount[j]);}
           HandGenerator(&state, j, state.handCount[j], 0, treasure_map);
@@ -105,33 +108,30 @@ int main(int argc, char** argv){
         }
         else
         {
+          state.handCount[j] = (rand()%maxHand);
           HandGenerator(&state, j, state.handCount[j], 0, treasure_map);
         }
         
     }
     
-/* -- TEST CHECKS -- */
-
-    // Number of Players:
-    printf("Number of Players: %d\n",num_players);
-
-    // Display Each Player's Hand
-    for(r=0 ; r<num_players; r++)
-    {
-      DisplayHand(&state, r, "Player");
-    }
-
-    for(r=0 ; r<num_players; r++)
-    {
-      DisplayDeck(&state, r, "Player");
-    }
-
-/* -- END OF TEST CHECKS -- */
+  for(j=0; j<num_players; j++)
+  {
+    state.discardCount[j] = (rand()%maxDiscard);
+    DiscardGenerator(&state, j, state.discardCount[j], 0, treasure_map);
+    state.deckCount[j] = (rand()%maxDeck);
+    DeckGenerator(&state, j, state.deckCount[j], 0, treasure_map);
+  }
 
     // call TributeTest and record if test was success or failure.. update stats.
     tributetest = TributeTest(&state, player1, player2, handPos);
 
-    if(tributetest){counter_failure++;}
+    if(tributetest)
+    {
+      counter_failure++;
+      printf("TEST #%d\n",i+1);
+      printf("Player1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player1],state.discardCount[player1],state.deckCount[player1]);
+      printf("Player2 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player2],state.discardCount[player2],state.deckCount[player2]);
+    }
     else{counter_success++;}
 
   } // end of for-loop
@@ -143,8 +143,7 @@ int main(int argc, char** argv){
 
   }
 
-
-// Tribute Random Test Function
+/* -- Tribute Random Test Function -- */
 int TributeTest(struct gameState *state, int player1, int player2, int handPos)
 {
   // Variables
@@ -171,48 +170,82 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   {
     if(state->deckCount[player2] > 0)
     {
-        // check revealed card
+      // check revealed card
+      assert_state = AssertTest((tributeRevealedCards[0] == state->deck[player2][state->deckCount[player2]-1]), "Revealed Card 1");
+      if(assert_state){flagFail = 1; printf("\tRevealed Card 1: Current = %d, Expected = %d\n", tributeRevealedCards[0], state->deck[player2][state->deckCount[player2]-1]);}
 
-        // +1 discard count
+      // +1 discard count
+      assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2]+1), "Player2: Discard Count");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]+1);}
 
-        // -1 deck count
+      // -1 deck count
+      assert_state = AssertTest((testState.deckCount[player2] == state->deckCount[player2]-1), "Player2: Deck Count");
+      if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state->deckCount[player2]-1);}
     }
 
     else if(state->discardCount[player2] >0)
     {
-        // check revealed card
+      // check revealed card
 
-        // +0 discard count
+      // +0 discard count
+      assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2]), "Player2: Discard Count");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]);}
 
-        // +0 deck count
+      // +0 deck count
+      assert_state = AssertTest((testState.deckCount[player2] == state->deckCount[player2]), "Player2: Deck Count");
+      if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state->deckCount[player2]);}
     }
-
+    // No Cards to Reveal
     else
-    {
-        // NO Cards to Reveal
-        
-        // Revealed Cards == -1
-        // +0 discard count
-        // +0 deck count
+    {        
+      // Revealed Cards == -1
+      assert_state = AssertTest((tributeRevealedCards[0] == -1), "Revealed Card 1 == -1");
+      if(assert_state){flagFail = 1; printf("\tRevealed Card 1: Current = %d Expected = %d\n", tributeRevealedCards[0], -1);}
+
+      assert_state = AssertTest((tributeRevealedCards[1] == -1), "Revealed Card 2 == -1");
+      if(assert_state){flagFail = 1; printf("\tRevealed Card 2: Current = %d Expected = %d\n", tributeRevealedCards[1], -1);}
+
+      // +0 discard count
+      assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2]), "Player2: Discard Count");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]);}
+
+      // +0 deck count
+      assert_state = AssertTest((testState.deckCount[player2] == state->deckCount[player2]), "Player2: Deck Count");
+      if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state->deckCount[player2]);}
     } 
   }
 
   else
   {
-    // if(state->deckCount[player2] == 0)
-      //testState deck count -2 == state discard count
+    if(state->deckCount[player2] == 0)
+    {
+      //testState deck count== state discard count -2
+      assert_state = AssertTest((testState.deckCount[player2] == state->discardCount[player2]-2), "Player2: Deck Count");
+      if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state->discardCount[player2]-2);}
+
+      assert_state = AssertTest((testState.discardCount[player2] == 2), "Player2: Discard Count");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], 2);}
 
       // check shuffle
+      assert_state = AssertTest((CheckShuffle(state, &testState, player2) == 1), "Player2: Shuffle Works");
+      if(assert_state){flagFail = 1; printf("\tWARNING: Cards May Not Have Been Shuffled. Order Remained The Same.\n");}
 
+    }
+    else
+    {
+      // +2 Discard Count
+      assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2])+2, "Player2: Discard Count");
+      if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]+2);}
+    }
+    
     // check revealed cards ...
-
-    // +2 discard Count
 
   }
   
 
   /* - tributeRevealedCards Stats: - */
-  if(tributeRevealedCards[0] != -1){
+  if(tributeRevealedCards[0] != -1)
+  {
     assert_state = AssertTest((tributeRevealedCards[0] != tributeRevealedCards[1]), "Revealed Card 1 != Revealed Card 2");
     if(assert_state){flagFail = 1; printf("\tRevealed Card 1: %d != Revaled Card 2: %d\n", tributeRevealedCards[0], tributeRevealedCards[1]);}
   }
@@ -244,7 +277,7 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
     
   }
 
- // Player1: Bonus Count
+  // Player1: Bonus Count
   assert_state = AssertTest((bonus == bonus_start+bonus_count), "Player1: Bonus Count");
   if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+bonus_count);}
 
@@ -252,13 +285,32 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   assert_state = AssertTest((testState.numActions == state->numActions+action_count), "Player1: Action Count");
   if(assert_state){flagFail = 1; printf("\tAction Count: Current = %d vs. Expected = %d\n", testState.numActions, state->numActions+action_count); }
 
-  // Player1: Hand Count
-  assert_state = AssertTest((testState.handCount[player1] == state->handCount[player1]-1+hand_count), "Player1: Hand Count");
-  if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state->handCount[player1]-1+hand_count);}
 
-  // +1 Discard Count
-  assert_state = AssertTest((testState.discardCount[player1] == state->discardCount[player1]+1), "Player1: Discard Count");
-  if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state->discardCount[player1]+1);}
+  // Player1: Hand Count - Not enough cards in discard and deck to draw
+  if(hand_count != 0 && (state->deckCount[player1] + state->discardCount[player1] < hand_count)) 
+  {
+    assert_state = AssertTest((testState.handCount[player1] == state->handCount[player1]-1+state->deckCount[player1] + state->discardCount[player1]), "Player1: Hand Count");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state->handCount[player1]-1+state->deckCount[player1] + state->discardCount[player1]);}
+  }
+  // Player1: Hand Count - Have enough cards to draw
+  else
+  {
+    assert_state = AssertTest((testState.handCount[player1] == state->handCount[player1]-1+hand_count), "Player1: Hand Count");
+    if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state->handCount[player1]-1+hand_count);}
+  }
+  
+  // Discard Count if Deck needs to acquire discard pile
+  if(hand_count != 0 && state->deckCount[player1] < (hand_count))
+  {
+    assert_state = AssertTest((testState.discardCount[player1] == 1), "Player1: Discard Count");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1],1);}
+  }
+  // Deck does not need to pull from discard.
+  else
+  {
+    assert_state = AssertTest((testState.discardCount[player1] == state->discardCount[player1]+1), "Player1: Discard Count");
+    if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state->discardCount[player1]+1);}
+  }
 
 
   return flagFail;
@@ -282,6 +334,43 @@ void HandGenerator(struct gameState *state, int player, int size, int min, int m
       state->hand[player][i] = (rand()%(max-min+1))+min;
   }
 
+  return;
+}
+
+// Random Discard Generator 
+void DiscardGenerator(struct gameState *state, int player, int size, int min, int max)
+{
+  int i;
+  if(min > max)
+  {
+      int temp = min;
+      min = max;
+      max = temp;
+  }
+
+  for(i=0; i<size; i++)
+  {
+      state->discard[player][i] = (rand()%(max-min+1))+min;
+  }
+
+  return;
+}
+
+// Random Deck Generator 
+void DeckGenerator(struct gameState *state, int player, int size, int min, int max)
+{
+  int i;
+  if(min > max)
+  {
+      int temp = min;
+      min = max;
+      max = temp;
+  }
+
+  for(i=0; i<size; i++)
+  {
+      state->deck[player][i] = (rand()%(max-min+1))+min;
+  }
 
   return;
 }
@@ -348,7 +437,7 @@ int HandCardCount2(struct gameState *state, int player, int choice1, int handPos
     return count;
 }
 
-// Compare that Pile was Shuffled
+// Compare that Pile was Shuffled (careful with small sample sizes ...)
 int CheckShuffle(struct gameState *state_old, struct gameState *state_new, int player)
 {
   int retVal = -1;

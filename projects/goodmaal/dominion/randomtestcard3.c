@@ -21,7 +21,6 @@
 #include <math.h>
 #include <time.h>
 
-
 /* -- ASSERT FUNCTION -- */
 int AssertTest(int pass, char* msg)
 {
@@ -32,26 +31,25 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        // OR NOT SAY ANYTHING?
         //printf("PASS: %s\n", msg);
         return 0;
     }
     
 }
 
-
 /* -- Helper Function Prototypes -- */
 void HandGenerator(struct gameState *state, int player, int size, int min, int max);
 void DiscardGenerator(struct gameState *state, int player, int size, int min, int max);
 void DeckGenerator(struct gameState *state, int player, int size, int min, int max);
+
 void DisplayHand(struct gameState *state, int player, char* msg);
 void DisplayDiscard(struct gameState *state, int player, char* msg);
 void DisplayDeck(struct gameState *state, int player, char* msg);
+
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
 int CheckShuffle(struct gameState *state_old, struct gameState *state_new, int player);  // retVal == 1 good, retVal <1 no shuffle
 int TributeTest(struct gameState *state, int player1, int player2, int handPos);
-
 
 /* -- MAIN FUNCTION -- */
 int main(int argc, char** argv){
@@ -122,9 +120,10 @@ int main(int argc, char** argv){
     DeckGenerator(&state, j, state.deckCount[j], 0, treasure_map);
   }
 
-    // call TributeTest and record if test was success or failure.. update stats.
+    // Run the Tribute Random Test
     tributetest = TributeTest(&state, player1, player2, handPos);
 
+    // Record Stats and if Failure occurs then print additional game information. 
     if(tributetest)
     {
       counter_failure++;
@@ -166,6 +165,7 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   if(tribute_return != 0){printf("Tribute Failed Execution\n");}
 
   /* - Player2 Stats: - */
+  // Player2 has 0 or 1 cards to reveal.
   if(state->discardCount[player2] + state->deckCount[player2] <= 1)
   {
     if(state->deckCount[player2] > 0)
@@ -182,11 +182,8 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
       assert_state = AssertTest((testState.deckCount[player2] == state->deckCount[player2]-1), "Player2: Deck Count");
       if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state->deckCount[player2]-1);}
     }
-
-    else if(state->discardCount[player2] >0)
+    else if(state->discardCount[player2] > 0)
     {
-      // check revealed card
-
       // +0 discard count
       assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2]), "Player2: Discard Count");
       if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]);}
@@ -215,6 +212,7 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
     } 
   }
 
+  // Player2 has > 1 card to reveal.
   else
   {
     if(state->deckCount[player2] == 0)
@@ -237,19 +235,15 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
       assert_state = AssertTest((testState.discardCount[player2] == state->discardCount[player2])+2, "Player2: Discard Count");
       if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state->discardCount[player2]+2);}
     }
-    
-    // check revealed cards ...
 
   }
   
-
   /* - tributeRevealedCards Stats: - */
   if(tributeRevealedCards[0] != -1)
   {
     assert_state = AssertTest((tributeRevealedCards[0] != tributeRevealedCards[1]), "Revealed Card 1 != Revealed Card 2");
     if(assert_state){flagFail = 1; printf("\tRevealed Card 1: %d != Revaled Card 2: %d\n", tributeRevealedCards[0], tributeRevealedCards[1]);}
   }
-
 
   /* - Player1 Stats: - */
   // Count/Tally Rewards Earned
@@ -265,11 +259,12 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
     {
         hand_count += 2;
     }
-
+    // Empty
     else if(tributeRevealedCards[z] == -1)
     {
         //Nothing
     }
+    // Action Card
     else
     {
         action_count += 2;

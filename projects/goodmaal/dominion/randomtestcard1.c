@@ -20,7 +20,6 @@
 #include <math.h>
 #include <time.h>
 
-
 /* -- ASSERT FUNCTION -- */
 int AssertTest(int pass, char* msg)
 {
@@ -31,14 +30,11 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        // OR NOT SAY ANYTHING?
         //printf("PASS: %s\n", msg);
         return 0;
     }
     
 }
-
-
 
 /* -- Helper Function Prototypes -- */
 void HandGenerator(struct gameState *state, int player, int size, int min, int max);
@@ -48,7 +44,6 @@ void DisplayDeck(struct gameState *state, int player, char* msg);
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
 int BaronTest(struct gameState *state, int player, int handPos, int choice1);
-
 
 /* -- MAIN FUNCTION -- */
 int main(int argc, char** argv){
@@ -74,7 +69,6 @@ int main(int argc, char** argv){
   // Kingdom Cards
   int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
 
-
   // Create a Game State and Clear Memory
   struct gameState state;
   memset(&state, 0, sizeof(struct gameState));   // clear the game state
@@ -82,21 +76,18 @@ int main(int argc, char** argv){
   /* -- Run count_tests number of tests -- */
   for(i=0; i<count_tests; i++)
   {
-    //printf("TEST #%d\n",i+1);
-
-
     // randomize number of playes: 2 to 4 playes 
     num_players = (rand()%(4-2+1))+2;
     
     // Initialize Game
     initializeGame(num_players, k, seed, &state);
 
-    // Randomize hand size, position, choice1 
+    // Randomize hand size, hand position, choice1 
     int hand_size = (rand()%10)+1; 
-    //int hand_size = 1;
+
     if(hand_size == 1){handPos = 0;}
     else{handPos = (rand()%hand_size);}
-    //handPos = 0;
+ 
     choice1 = (rand()%2);
     
     // set game state (hand count, random generated hand, and place of playing card (baron))
@@ -109,19 +100,18 @@ int main(int argc, char** argv){
     state.supplyCount[estate] = rand()%(estate_count+1);  // may need to weight the zero value higher ...
     //estate_count = state.supplyCount[estate];    
 
-    // call BaronTest and record if test was success or failure.. update stats.
+    // Run the Baron Random Test 
     int barontest = BaronTest(&state, player, handPos, choice1);
 
+    // Record Stats and if Failure occurs then print additional game information. 
     if(barontest){
-        //printf("FAIL----\n");
-        //printf("Number of Players: %d\n", num_players);
-        //printf("Hand Size: %d & Hand Pos: %d\n", state.handCount[player], handPos);
-        //printf("Number of Buys: %d\n", state.numBuys);
-        //printf("Choice: %d\n",choice1);
-        //DisplayHand(&state, player, "Player1");
-        //int hand_estate = HandCardCount(&state, player, estate);
-        //printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate]);
-        counter_failure++;}
+      printf("TEST #%d\n",i+1);
+      printf("Player1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player],state.discardCount[player],state.deckCount[player]);
+      int hand_estate = HandCardCount(&state, player, estate);
+      printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate]);
+      printf("Choice: %d\n\n",choice1);
+        counter_failure++;
+    }
     else{counter_success++;}
 
   } // end of primary for-loop
@@ -134,7 +124,7 @@ int main(int argc, char** argv){
 }
 
 
-// Baron Random Test (player choice dependent)
+/* -- Baron Random Test Function -- */
 int BaronTest(struct gameState *state, int player, int handPos, int choice1)
 {
   // Set-up test game state
@@ -179,18 +169,12 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
         // +0 Estate Supply Count
         assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)), "+0 Estate Supply Count");
         if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state));}    
- 
-        // +0 Trash Count?
-
-        // +0 Deck Count?
 
       }
 
       // Player does Not have an estate card in hand
       else
       {
-       
-        // check bonus
         // +0 Bonus
           assert_state = AssertTest((bonus == bonus_start), "+0 Bonus");
           if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
@@ -202,10 +186,6 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
         // +0 Estate Hand Count
         assert_state = AssertTest((HandCardCount(&testState, player, estate) == HandCardCount(state, player, estate)), "+0 Estate Hand Count");
         if(assert_state){flagFail = 1; printf("\tCopper Hand Count: Current = %d, Expected = %d\n", HandCardCount(&testState, player, estate), HandCardCount(state, player, estate));}
-
-        // +0 Trash Count?
-
-        // +0 Deck Count?
 
         // Estate Supply Count is Empty
         if(testState.supplyCount[estate] <=0  && state->supplyCount[estate] == 0) 
@@ -227,12 +207,8 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
           // -1 Estate Supply Count
           assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)-1), "-1 Estate Supply Count");
           if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state)-1);}    
-
         }
-
       }
-      
-
   }
 
   else
@@ -257,7 +233,6 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
       // -1 Estate Supply Count
       assert_state = AssertTest((supplyCount(estate, &testState) == supplyCount(estate, state)-1), "-1 Estate Supply Count");
       if(assert_state){flagFail = 1; printf("\tEstate Supply Count: Current= %d, Expected = %d\n", supplyCount(estate, &testState), supplyCount(estate, state)-1);}    
-
     }
 
   }
@@ -282,7 +257,6 @@ void HandGenerator(struct gameState *state, int player, int size, int min, int m
   {
       state->hand[player][i] = (rand()%(max-min+1))+min;
   }
-
 
   return;
 }

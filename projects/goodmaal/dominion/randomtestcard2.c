@@ -31,14 +31,11 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        // OR NOT SAY ANYTHING?
         //printf("PASS: %s\n", msg);
         return 0;
     }
     
 }
-
-
 
 /* -- Helper Function Prototypes -- */
 void HandGenerator(struct gameState *state, int player, int size, int min, int max);
@@ -48,7 +45,6 @@ void DisplayDeck(struct gameState *state, int player, char* msg);
 int HandCardCount(struct gameState *state, int player, int choice1);
 int HandCardCount2(struct gameState *state, int player, int choice1, int handPos);
 int MinionTest(struct gameState *state, int player1, int handPos, int choice1, int choice2, int num_players);
-
 
 /* -- MAIN FUNCTION -- */
 int main(int argc, char** argv){
@@ -74,7 +70,6 @@ int main(int argc, char** argv){
   // Kingdom Cards
   int k[10] = {adventurer, council_room, feast, gardens, mine, remodel, smithy, village, baron, great_hall};
 
-
   // Create a Game State and Clear Memory
   struct gameState state;
   memset(&state, 0, sizeof(struct gameState));   // clear the game state
@@ -82,8 +77,6 @@ int main(int argc, char** argv){
   /* -- Run count_tests number of tests -- */
   for(i=0; i<count_tests; i++)
   {
-    //printf("TEST #%d\n",i+1);
-   
     // randomize number of playes: 2 to 4 players 
     num_players = (rand()%(4-2+1))+2;
     
@@ -113,27 +106,23 @@ int main(int argc, char** argv){
     if(choice1){choice2 = 0;}
     else{choice2 = 1;}
 
-
-/* -- TEST CHECKS -- */
-/*
-    // Number of Players:
-    printf("Number of Players: %d\n",num_players);
-    printf("Choice1: %d\n",choice1);
-    printf("Choice2: %d\n",choice2);
-
-    // Display Each Player's Hand
-    for(r=0 ; r<num_players; r++)
-    {
-      DisplayHand(&state, r, "Player");
-    }
-
-*/
-/* -- END OF TEST CHECKS -- */
-
-    // call MinionTest and record if test was success or failure.. update stats.
+    // Run the Minion Random Test Iteration
     miniontest = MinionTest(&state, player1, handPos, choice1, choice2, num_players);
 
-    if(miniontest){counter_failure++;}
+    // Record Stats and if Failure occurs then print additional game information. 
+    if(miniontest)
+    {
+      counter_failure++;
+      printf("TEST #%d\n",i+1);
+      for(r=0; r<num_players; r++)
+      {
+        printf("Player%d Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", r+1, state.handCount[r],state.discardCount[r],state.deckCount[r]);
+        DisplayHand(&state, r, "Player");
+      }
+      printf("Choice1: %d & Choice2: %d\n\n",choice1, choice2);
+    
+    
+    }
     else{counter_success++;}
 
   } // end of primary for-loop
@@ -145,7 +134,7 @@ int main(int argc, char** argv){
 }
 
 
-// Minion Random Test
+/* -- Minion Random Test Function -- */
 int MinionTest(struct gameState *state, int player1, int handPos, int choice1, int choice2, int num_players)
 {
   // Variables
@@ -221,16 +210,11 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
           {
             assert_state = AssertTest((testState.discardCount[z] == state->discardCount[z]), "+0 Discard Count");
             if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[z], state->discardCount[z]);}  
-
           }
-          
 
         }
-
     }
-
   }
-
 
   return flagFail;
 }

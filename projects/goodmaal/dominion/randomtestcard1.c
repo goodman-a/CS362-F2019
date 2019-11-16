@@ -30,7 +30,7 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        //printf("PASS: %s\n", msg);
+        printf("PASS: %s\n", msg);
         return 0;
     }
     
@@ -101,17 +101,11 @@ int main(int argc, char** argv){
     //estate_count = state.supplyCount[estate];    
 
     // Run the Baron Random Test 
+    printf("_____ TEST #%d _____\n",i+1);
     int barontest = BaronTest(&state, player, handPos, choice1);
 
     // Record Stats and if Failure occurs then print additional game information. 
-    if(barontest){
-      printf("TEST #%d\n",i+1);
-      printf("Player1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player],state.discardCount[player],state.deckCount[player]);
-      int hand_estate = HandCardCount(&state, player, estate);
-      printf("Number of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state.supplyCount[estate]);
-      printf("Choice: %d\n\n",choice1);
-        counter_failure++;
-    }
+    if(barontest){ counter_failure++; }
     else{counter_success++;}
 
   } // end of primary for-loop
@@ -237,6 +231,13 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
 
   }
   
+    if(flagFail){
+      printf("  *More Information: \n");
+      printf("\tPlayer1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state->handCount[player],state->discardCount[player],state->deckCount[player]);
+      int hand_estate = HandCardCount(state, player, estate);
+      printf("\tNumber of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state->supplyCount[estate]);
+    }
+
   return flagFail;
 }
 

@@ -185,7 +185,7 @@ int initializeGame(int numPlayers, int kingdomCards[10], int randomSeed,
     state->phase = 0;
     state->numActions = 1;
     state->numBuys = 1;
-    state->playedCardCount = 0;
+    state->trashedCardCount = 0;
     state->whoseTurn = 0;
     state->handCount[state->whoseTurn] = 0;
     //int it; move to top
@@ -375,7 +375,7 @@ int endTurn(struct gameState *state) {
     state->numActions = 1;
     state->coins = 0;
     state->numBuys = 1;
-    state->playedCardCount = 0;
+    state->trashedCardCount = 0;
     state->handCount[state->whoseTurn] = 0;
 
     //int k; move to top
@@ -701,7 +701,25 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
             int p = 0;//Iterator for hand!
             int card_not_discarded = 1;//Flag for discard set!
             while(card_not_discarded) {
-                if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
+                // added this to fix a current bug in the program when there is only 1 card in the hand.
+                if(p >= state->handCount[currentPlayer])
+                {
+                    if(DEBUG) {
+                        printf("No estate cards in your hand, invalid choice\n");
+                        printf("Must gain an estate if there are any\n");
+                    }
+                    if (supplyCount(estate, state) > 0) { 
+                        gainCard(estate, state, 2, currentPlayer); // @Baron Bug 01 - Changed the toFlag to 2 (add to hand) from 0 (add to discard)
+                        // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
+                        //state->supplyCount[estate]--;//Decrement estates
+                        if (supplyCount(estate, state) == 0) {
+                            isGameOver(state);
+                        }
+                    }
+                    card_not_discarded = 0;//Exit the loop
+                }
+
+               else if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
                    // state->coins += 4;//Add 4 coins to the amount of coins
                     *bonus = 4; // Piazza Post - adams Rosales
 
@@ -714,22 +732,6 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
                     state->handCount[currentPlayer]--;
                     card_not_discarded = 0;//Exit the loop
                 }
-                else if (p > state->handCount[currentPlayer]) {
-                    if(DEBUG) {
-                        printf("No estate cards in your hand, invalid choice\n");
-                        printf("Must gain an estate if there are any\n");
-                    }
-                    if (supplyCount(estate, state) > 0) { 
-                        gainCard(estate, state, 2, currentPlayer); // @Baron Bug 01 - Changed the toFlag to 2 (add to hand) from 0 (add to discard)
-
-                        // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
-                        //state->supplyCount[estate]--;//Decrement estates
-                        if (supplyCount(estate, state) == 0) {
-                            isGameOver(state);
-                        }
-                    }
-                    card_not_discarded = 0;//Exit the loop
-                }
 
                 else {
                     p++;//Next card
@@ -739,12 +741,13 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
 
         else {
             if (supplyCount(estate, state) > 0) {
-                gainCard(estate, state, 0, currentPlayer);//Gain an estate
+                // @Baron Bug 02 - Changed gaining an estate card to gaining a Treasure Card instead (copper...eww)
+                gainCard(copper, state, 0, currentPlayer);//Gain an estate
 
                 // Piazza Post - Mandi Grant (Already decrements in the gainCard function)
                 //state->supplyCount[estate]--;//Decrement Estates  
 
-                /*  // @Baron Bug 02 - Comment out the if-statement checking if game is over after taking an Estate card
+                /*  // Originally Bug 02, but decided to refactor out since it does nothing. Leaving commented out for now
                 if (supplyCount(estate, state) == 0) {
                     isGameOver(state);
                 }
@@ -757,7 +760,7 @@ int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* sta
         return 0;
 }
 
-int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state)
+int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus)
 {
     int i,j = 0; // Iterators (Added after relocating from Switch Statement)
     
@@ -769,14 +772,17 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
 
     if (choice1)
     {
-        state->coins = state->coins + 2;
+        // change to bonus pointer. similar to baron card (Piazza Post - Serena T.)
+        //state->coins = state->coins + 2;  
+        *bonus = 2;
     }
     else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
+        // Piazza Post - Brian Terrell 
         //discard hand
-        while(numHandCards(state) > 0)
+        while(state->handCount[currentPlayer] > 0 )
         {
-            discardCard(handPos, currentPlayer, state, 0);
+            discardCard(0, currentPlayer, state, 0);
         }
 
         //draw 4
@@ -792,18 +798,12 @@ int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct 
             {
                 if (state->handCount[i] >= 4)  //@Minion Bug 02 - Changed Conditional from '> 4' to '>=4'
                 {
-                    // Piazza Post - Zee
-                    for (j=0; j<state->handCount[currentPlayer]; j++)
-                      {
-                          discardCard(j, i, state, 0);
-                      }
-                    /*
-                    //discard hand
-                    while (state->handCount[i] > 0)
+                    // Piazza Post - Zee & Brian Terrell 
+                    // discard hand
+                    while(state->handCount[i] > 0)
                     {
-                        discardCard(handPos, i, state, 0);
+                        discardCard(0, i, state, 0);
                     }
-                    */
 
                     //draw 4
                     for (j = 0; j < 4; j++)
@@ -836,7 +836,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
         for (i = 0; i < state->handCount[currentPlayer]; i++)
         {
             // @Ambassador Bug 01 - Changed '&&' to '||' 
-            if (i != handPos || state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1] || i != choice1) // Piazza Post - Akifumi Komori
+            if (i != handPos || state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1] || i !=choice1) // Piazza Post - Akifumi Komori
             {
                 j++;
             }
@@ -846,8 +846,7 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             return -1;
         }
 
-        if (DEBUG)
-            printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
+        //printf("Player %d reveals card number: %d & j-count: %d\n", currentPlayer, state->hand[currentPlayer][choice1],j);
 
         // @Ambassador Bug 02 - Commented Out / Removed the Code that increases the supply count.
         //increase supply count for chosen card by amount being discarded
@@ -862,9 +861,6 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             }
         }
 
-        //discard played card from hand
-        discardCard(handPos, currentPlayer, state, 0);
-
         //trash copies of cards returned to supply
         for (j = 0; j < choice2; j++)
         {
@@ -872,25 +868,40 @@ int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, str
             {
                 if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
                 {
+                   // printf("Trash Time: (%d) vs. i: %d\n",state->hand[currentPlayer][choice1],i);
                     discardCard(i, currentPlayer, state, 1);
                     break;
                 }
             }
         }
 
+        // need to relocate where hand position for ambassador card is
+        for (i=0; i < state->handCount[currentPlayer];i++)
+        {
+            if(state->hand[currentPlayer][i] == ambassador)
+            {
+                handPos = i;
+                break;
+            }
+        }
+
+        //discard played card from hand
+        discardCard(handPos, currentPlayer, state, 0);
+
+
         return 0;
 
 }
 
 
-int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state){
+int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus){
     int i;
    if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
             if (state->deckCount[nextPlayer] > 0) {
                 tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 // Piazza Post  - Brian Terrell
-                state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->discardCount[nextPlayer]++;
+                state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
 
                 state->deckCount[nextPlayer]--;
@@ -907,62 +918,65 @@ int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevea
             }
         }
 
-        else {
-            if (state->deckCount[nextPlayer] == 0) {
-                for (i = 0; i < state->discardCount[nextPlayer]; i++) {
-                    state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
-                    state->deckCount[nextPlayer]++;
-                    state->discard[nextPlayer][i] = -1;
-                    state->discardCount[nextPlayer]--;
-                }
-                // @Tribute Bug 01 - Commented out shuffle
-                // shuffle(nextPlayer,state);//Shuffle the deck
+    else {
+        if (state->deckCount[nextPlayer] == 0) {     
+            int count_discard = state->discardCount[nextPlayer];  
+            for (i = 0; i < count_discard; i++) {
+                state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
+                state->deckCount[nextPlayer]++;
+                state->discard[nextPlayer][i] = -1;
+                state->discardCount[nextPlayer]--;
             }
-            tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post - Brian Terrell
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->discardCount[nextPlayer]++;
+            // @Tribute Bug 01 - Commented out shuffle
+            //shuffle(nextPlayer,state);//Shuffle the deck
+        }
+        tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        // Piazza Post - Brian Terrell
+        state->discardCount[nextPlayer]++;
+        state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
-            state->deckCount[nextPlayer]--;
-            tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            // Piazza Post - Brian Terrell
-            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->discardCount[nextPlayer]++;
+        state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
+        state->deckCount[nextPlayer]--;
 
-            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
-            state->deckCount[nextPlayer]--;
+        tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+        // Piazza Post - Brian Terrell
+        state->discardCount[nextPlayer]++;
+        state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+
+        state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; // Piazza Post - Akifumi Komori
+        state->deckCount[nextPlayer]--;
+    }
+
+    if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
+        state->trash[state->trashedCardCount] = tributeRevealedCards[1];
+        state->trashedCardCount++;
+        tributeRevealedCards[1] = -1;
+    }
+
+    for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
+        if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
+            // Piazza Post - Adams Rosales
+            //state->coins += 2;
+            *bonus += 2;
         }
 
-        if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
-            state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
-            state->playedCardCount++;
-            tributeRevealedCards[1] = -1;
+        else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
+            //drawCard(currentPlayer, state); // @Tribute Bug 02 - Commented out one of the drawCard functions 
+            drawCard(currentPlayer, state);
         }
-
-        for (i = 0; i < 2; i++) {   // Piazza Post - Brian Terrell
-            if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
-                state->coins += 2;
+        // Piazza Post - Mandi Grant
+        else if (tributeRevealedCards[i] == -1){
+            if (DEBUG){
+                printf("Both revealed cards are the same");
             }
-
-            else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
-                //drawCard(currentPlayer, state); // @Tribute Bug 02 - Commented out one of the drawCard functions 
-                drawCard(currentPlayer, state);
-            }
-            // Piazza Post - Mandi Grant
-            else if (tributeRevealedCards[i] == -1){
-                if (DEBUG){
-                    printf("Both revealed cards are the same");
-                }
-            } else { //Action Card
-                state->numActions = state->numActions + 2;
-            }
+        } else { //Action Card
+            state->numActions = state->numActions + 2;
         }
+    }
 
-        discardCard(handPos, currentPlayer, state, 0); // Piazza Post - Robert Saraceno
+    discardCard(handPos, currentPlayer, state, 0); // Piazza Post - Robert Saraceno
 
-        return 0;
-
+    return 0;
 
 }
 
@@ -1213,7 +1227,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case minion:
 
-        retVal = minionCard(handPos, currentPlayer, choice1, choice2, state);
+        retVal = minionCard(handPos, currentPlayer, choice1, choice2, state, bonus);
         return retVal;
 
     case steward:
@@ -1241,7 +1255,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
     case tribute:
 
-        retVal = tributeCard(handPos, currentPlayer, nextPlayer, tributeRevealedCards, state);
+        retVal = tributeCard(handPos, currentPlayer, nextPlayer, tributeRevealedCards, state, bonus);
 
         return retVal;
 
@@ -1373,42 +1387,40 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 int discardCard(int handPos, int currentPlayer, struct gameState *state, int trashFlag)
 {
+    /* -- Refactored from Piazza Post by Kitch McKaen Kelly -- */
 
-    //if card is not trashed, added to Played pile
-    if (trashFlag < 1)
+    //if trash flag is set, add to trash pile
+    if (trashFlag != 0)
     {
-        //add card to played pile
-        state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
-        state->playedCardCount++;
+        //add card to trash pile
+        state->trash[state->trashedCardCount] = state->hand[currentPlayer][handPos];
+        state->trashedCardCount++;
+    }
 
-        // Piazza Post - Akifumi Komori
-        state->discard[currentPlayer][ state->discardCount[currentPlayer] ] = state->hand[currentPlayer][handPos];
+    //if trash flag is not set, add to player's discard pile
+    else
+    {
+        state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][handPos];
         state->discardCount[currentPlayer]++;
     }
 
+    //remove played card from player's hand
     //set played card to -1
     state->hand[currentPlayer][handPos] = -1;
 
-    //remove card from player's hand
-    if ( handPos == (state->handCount[currentPlayer] - 1) ) 	//last card in hand array is played
+    //if discarded card is not the last card in the player's hand or the only card in the player's hand -> move cards up to fill gap
+    if ((handPos != (state->handCount[currentPlayer] -1 )) && (state->handCount[currentPlayer] != 1))
     {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
+        //need to maintain hand order -> set hand[p] = hand[p+1]
+        for (int p = handPos; p < state->handCount[currentPlayer]; p++)
+        {
+            state->hand[currentPlayer][p] = state->hand[currentPlayer][p + 1];
+        }
+        state->hand[currentPlayer][state->handCount[currentPlayer]-1] = -1;
     }
-    else if ( state->handCount[currentPlayer] == 1 ) //only one card in hand
-    {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
-    else
-    {
-        //replace discarded card with last card in hand
-        state->hand[currentPlayer][handPos] = state->hand[currentPlayer][ (state->handCount[currentPlayer] - 1)];
-        //set last card to -1
-        state->hand[currentPlayer][state->handCount[currentPlayer] - 1] = -1;
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
+
+    //reduce number of cards in hand
+    state->handCount[currentPlayer]--;
 
     return 0;
 }

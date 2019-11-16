@@ -69,8 +69,8 @@ struct gameState {
     int deckCount[MAX_PLAYERS];
     int discard[MAX_PLAYERS][MAX_DECK];
     int discardCount[MAX_PLAYERS];
-    int playedCards[MAX_DECK];
-    int playedCardCount;
+    int trash[MAX_DECK];
+    int trashedCardCount;
 };
 
 /* All functions return -1 on failure, and DO NOT CHANGE GAME STATE;
@@ -132,9 +132,9 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state);
 /* - Assignment 2 Card Refactors - */
 
 int baronCard(int handPos, int choice1, int currentPlayer, struct gameState* state, int* bonus);
-int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
+int minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus);
 int ambassadorCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
-int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state);
+int tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
 int mineCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state);
 
 #endif

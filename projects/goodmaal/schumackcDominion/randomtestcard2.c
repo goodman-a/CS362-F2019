@@ -7,7 +7,8 @@
  * File: randomtestcard2.c
  * 
  * File Description: Random Tester for the Minion Card Function:
- *  minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus);
+ * OLD:  minionCard(int handPos, int currentPlayer, int choice1, int choice2, struct gameState* state, int* bonus);
+ * NEW: minionCardEffect(choice1, choice2, &testState, handPos);
  * 
  */
 
@@ -149,7 +150,7 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
   memcpy(&testState, state, sizeof(struct gameState));
 
   // call minion function ...
-  minion_return = minionCard(handPos, player1, choice1, choice2, &testState, &bonus);
+  minion_return = minionCardEffect(choice1, choice2, &testState, handPos);
   if(minion_return != 0){printf("Minion Failed Execution\n");}
   
   // +1 Action
@@ -157,15 +158,15 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
   if(assert_state){flagFail = 1; printf("\tNumber of Actions: Current = %d vs. Expected = %d\n", testState.numActions, state->numActions +1); }
 
   // +0 Trash Count
-  assert_state = AssertTest((testState.trashedCardCount == state->trashedCardCount), "+0 Trashed Card Count");
-  if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state->trashedCardCount);}
+  //assert_state = AssertTest((testState.trashedCardCount == state->trashedCardCount), "+0 Trashed Card Count");
+  //if(assert_state){flagFail = 1; printf("\tTrash Count: Current = %d, Expected = %d\n", testState.trashedCardCount, state->trashedCardCount);}
  
   // Player selected choice1 (+2 Bonus)
   if(choice1)
   {
     // +2 Bonus
-    assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+    assert_state = AssertTest((testState.coins == state->coins+2), "+2 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state->coins+2);}
 
     // +1 Discard Count
     assert_state = AssertTest((testState.discardCount[player1] == state->discardCount[player1]+1), "Player1: +1 Discard Count");
@@ -180,8 +181,8 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
   else if(choice2)
   {
     // +0 Bonus
-    assert_state = AssertTest((bonus == bonus_start), "Player1: +0 Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    assert_state = AssertTest((testState.coins == state->coins), "+0 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", testState.coins, state->coins);}
 
     // Player 1: Test Hand Count <= 4 (could check more indepth with checking deck/discard sizes and if deck is empty)
     assert_state = AssertTest((testState.handCount[player1] <= 4), "Player1: Hand Count <= 4");

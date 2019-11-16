@@ -7,7 +7,8 @@
  * File: unittest1.c
  * 
  * File Description: Unit Test for the Baron Card Function:
- *   baronCard(int handPos, int choice1, int currentPlayer, struct gameState* state, int* bonus)
+ *   OLD: baronCard(int handPos, int choice1, int currentPlayer, struct gameState* state, int* bonus)
+ *   NEW: int baronCardEffect(int choice1, struct gameState *state)
  * 
  */
 
@@ -141,7 +142,7 @@ int main(int argc, char** argv){
     bonus = 0;
     flagFail = 0;
 
-    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    baron_return = baronCardEffect(choice1, &testState);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // numBuys has increased by 1 
@@ -149,8 +150,8 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Bonus Number has increased to +4
-    assert_state = AssertTest((bonus == bonus_start +4 ), "+4 Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
+    assert_state = AssertTest((testState.coins == state.coins +4 ), "+4 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+4);}
 
     // Hand Count has decreased by 2
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-2), "-2 Hand Count (Should Be Estate & Baron)");
@@ -182,7 +183,7 @@ int main(int argc, char** argv){
     bonus = 0;
     flagFail = 0;
 
-    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    baron_return = baronCardEffect(choice1, &testState);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // numBuys has increased by 1 
@@ -190,8 +191,8 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Bonus Number has NOT increased
-    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    assert_state = AssertTest((testState.coins == state.coins), "+0 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
     // Hand Count has decreased by 1
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
@@ -227,7 +228,7 @@ int main(int argc, char** argv){
     bonus = 0;
     flagFail = 0;
 
-    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    baron_return = baronCardEffect(choice1, &testState);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // Check numBuys has increased by 1 
@@ -235,8 +236,8 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Check Bonus Number has NOT increased
-    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    assert_state = AssertTest((testState.coins == state.coins), "+0 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
     // Check Hand Count has decreased by 1
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
@@ -270,7 +271,7 @@ int main(int argc, char** argv){
     bonus = 0;
     flagFail = 0;
 
-    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    baron_return = baronCardEffect(choice1, &testState);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // numBuys has increased by 1 
@@ -278,8 +279,8 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Bonus Number has NOT increased
-    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    assert_state = AssertTest((testState.coins == state.coins), "+0 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
     // Hand Count has decreased by 1
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");
@@ -315,7 +316,7 @@ int main(int argc, char** argv){
     bonus = 0;
     flagFail = 0;
 
-    baron_return = baronCard(handPos, choice1, player1, &testState, &bonus);
+    baron_return = baronCardEffect(choice1, &testState);
     printf("Baron Value Returned: %d\n", baron_return);
 
     // numBuys has increased by 1 
@@ -323,8 +324,8 @@ int main(int argc, char** argv){
     if(assert_state){flagFail = 1; printf("\tNumber of Buys: Current = %d vs. Expected = %d\n", testState.numBuys, state.numBuys +1); }
 
     // Bonus Number has NOT increased
-    assert_state = AssertTest((bonus == bonus_start), "No Bonus");
-    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+    assert_state = AssertTest((testState.coins == state.coins), "+0 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
     // Hand Count has decreased by 1
     assert_state = AssertTest((testState.handCount[player1] == state.handCount[player1]-1), "-1 Hand Count (Should Be Baron)");

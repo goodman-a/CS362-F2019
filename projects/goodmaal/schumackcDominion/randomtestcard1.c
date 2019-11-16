@@ -138,7 +138,7 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
   int assert_state, baron_return;
 
   // call baron function ...
-  baron_return = baronCard(handPos, choice1, player, &testState, &bonus);
+  baron_return = baronCardEffect(choice1, &testState); 
   if(baron_return != 0){printf("Baron Failed Execution\n");}
   
   // check action
@@ -151,8 +151,8 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
       if(HandCardCount(state, player, estate) >= 1)
       {
         // +4 Bonus
-        assert_state = AssertTest((bonus == bonus_start +4 ), "+4 Bonus");
-        if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
+        assert_state = AssertTest((testState.coins == state->coins+4), "+4 Bonus");
+        if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state->coins+4);}
 
         // -2 Hand Count
         assert_state = AssertTest((testState.handCount[player] == state->handCount[player]-2), "-2 Hand Count (Estate & Baron)");
@@ -176,8 +176,8 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
       else
       {
         // +0 Bonus
-          assert_state = AssertTest((bonus == bonus_start), "+0 Bonus");
-          if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+        assert_state = AssertTest((testState.coins == state->coins), "+0 Bonus");
+        if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", testState.coins, state->coins);}
 
         // -1 Hand Count
         assert_state = AssertTest((testState.handCount[player] == state->handCount[player]-1), "-1 Hand Count (Baron Discarded)");

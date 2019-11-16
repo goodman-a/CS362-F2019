@@ -174,6 +174,18 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
     if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", testState.coins, state->coins);}
 
     // Player 1: Test Hand Count <= 4 (could check more indepth with checking deck/discard sizes and if deck is empty)
+    if(state->discardCount[player1] + state->deckCount[player1] +state->handCount[player1] < 4)
+    {
+      assert_state = AssertTest((testState.handCount[player1] == state->discardCount[player1] + state->deckCount[player1] +state->handCount[player1]), "Player1: Hand Count == Total Cards");
+      if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], state->discardCount[player1] + state->deckCount[player1] +state->handCount[player1]);}
+    }
+    else
+    {
+      assert_state = AssertTest((testState.handCount[player1] == 4), "Player1: Hand Count == 4");
+      if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected = %d\n", testState.handCount[player1], 4);}
+
+    }
+    
     assert_state = AssertTest((testState.handCount[player1] <= 4), "Player1: Hand Count <= 4");
     if(assert_state){flagFail = 1; printf("\tHand Count: Current = %d, Expected <= %d\n", testState.handCount[player1], 4);}
 

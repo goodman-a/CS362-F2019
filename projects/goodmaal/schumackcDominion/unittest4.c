@@ -7,7 +7,8 @@
  * File: unittest4.c
  * 
  * File Description: Unit Test for the Tribute Card Function:
- *   tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
+ *   Orig: tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
+ *   New: int tributeCardEffect(struct gameState *state)
  * 
  * DOES NOT CHECK FOR CASES WHERE 3+ Rewards with cards having 2 types
  * 
@@ -131,7 +132,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -154,8 +155,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDiscard Pile Last Card: Current = %d, Expected = %d\n", testState.discard[player2][testState.discardCount[player2]-1], state.deck[player2][state.deckCount[player2]-1]);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+    assert_state = AssertTest((testState.coins == state.coins+2), "+2 Bonus");
+    if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +0 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions), "Player1: +0 Action");
@@ -198,7 +199,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -221,8 +222,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDiscard Pile Last Card: Current = %d, Expected = %d\n", testState.discard[player2][testState.discardCount[player2]-1], minion);}
 
   // Player1: +0 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+0), "Player1: +0 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+  assert_state = AssertTest((testState.coins == state.coins), "Player1: +0 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");
@@ -258,7 +259,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -277,8 +278,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player2], state.discardCount[player2]);}
 
   // Player1: +0 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+0), "Player1: +0 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+  assert_state = AssertTest((testState.coins == state.coins), "Player1: +0 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
   // Player1: +0 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions), "Player1: +0 Action");
@@ -319,7 +320,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -346,8 +347,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], 0);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");
@@ -383,7 +384,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -410,8 +411,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state.deckCount[player2]-2);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");
@@ -449,7 +450,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -476,8 +477,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state.deckCount[player2]-2);}
 
   // Player1: +0 Bonus 
-  assert_state = AssertTest((bonus == bonus_start), "Player1: +0 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start);}
+  assert_state = AssertTest((testState.coins == state.coins), "Player1: +0 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");
@@ -515,7 +516,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -542,8 +543,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state.deckCount[player2]-2);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +0 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions), "Player1: +0 Action");
@@ -581,7 +582,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -608,8 +609,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state.deckCount[player2]-2);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +0 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions), "Player1: +0 Action");
@@ -647,7 +648,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect( &testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -674,8 +675,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], state.deckCount[player2]-2);}
 
   // Player1: +4 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+4), "Player1: +4 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+4);}
+  assert_state = AssertTest((testState.coins == state.coins+4), "Player1: +4 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+4);}
 
   // Player1: +0 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions), "Player1: +0 Action");
@@ -719,7 +720,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect( &testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -746,8 +747,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], 3);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");
@@ -794,7 +795,7 @@ int main(int argc, char** argv){
   memcpy(&testState, &state, sizeof(struct gameState));
 
   // Call the tributeCard Function
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect( &testState);
 
   // Check for return value
   assert_state = AssertTest((tribute_return == 0), "Tribute Card Returned Properly");
@@ -825,8 +826,8 @@ int main(int argc, char** argv){
   if(assert_state){flagFail = 1; printf("\tDeck Count: Current = %d, Expected = %d\n", testState.deckCount[player2], 0);}
 
   // Player1: +2 Bonus 
-  assert_state = AssertTest((bonus == bonus_start+2), "Player1: +2 Bonus");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+2);}
+  assert_state = AssertTest((testState.coins == state.coins+2), "Player1: +2 Bonus");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Expected = %d\n", testState.coins, state.coins+2);}
 
   // Player1: +2 numActions  
   assert_state = AssertTest((testState.numActions == state.numActions+2), "Player1: +2 Action");

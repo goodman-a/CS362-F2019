@@ -7,8 +7,8 @@
  * File: randomtestcard3.c
  * 
  * File Description: Random Tester for the Tribute Card Function:
- *   tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
- * 
+ *   Orig: tributeCard(int handPos, int currentPlayer, int nextPlayer, int tributeRevealedCards[], struct gameState* state, int* bonus);
+ *   New: int tributeCardEffect(struct gameState *state)
  * 
  */
 
@@ -161,7 +161,7 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   memcpy(&testState, state, sizeof(struct gameState));
 
   // call tributeCard function ...
-  tribute_return = tributeCard(handPos, player1, player2, tributeRevealedCards, &testState, &bonus);
+  tribute_return = tributeCardEffect(&testState);
   if(tribute_return != 0){printf("Tribute Failed Execution\n");}
 
   /* - Player2 Stats: - */
@@ -273,8 +273,8 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
   }
 
   // Player1: Bonus Count
-  assert_state = AssertTest((bonus == bonus_start+bonus_count), "Player1: Bonus Count");
-  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", bonus, bonus_start+bonus_count);}
+  assert_state = AssertTest((testState.coins == state->coins + bonus_count), "Player1: Bonus Count");
+  if(assert_state) {flagFail = 1; printf("\tBonus Count: Current = %d vs. Exepected = %d\n", testState.coins, state->coins + bonus_count);}
 
   // Player1: Action Count 
   assert_state = AssertTest((testState.numActions == state->numActions+action_count), "Player1: Action Count");

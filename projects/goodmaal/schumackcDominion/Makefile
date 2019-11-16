@@ -32,7 +32,7 @@ player: player.c interface.o
 	gcc -o player player.c -g  dominion.o rngs.o interface.o $(CFLAGS)
 
 
-randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c unittest1.c unittest2.c unittest3.c unittest4.c unittest5.c dominion.o rngs.o 
+testresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c unittest1.c unittest2.c unittest3.c unittest4.c unittest5.c dominion.o rngs.o 
 	echo "randomtestcard1.c:" >> testresults.out
 	gcc -o randomtestcard1 -g randomtestcard1.c dominion.o rngs.o $(CFLAGS)
 	echo "randomtestcard2.c:" >> testresults.out

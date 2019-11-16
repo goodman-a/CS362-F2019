@@ -121,16 +121,11 @@ int main(int argc, char** argv){
   }
 
     // Run the Tribute Random Test
+    printf("\n_____ TEST #%d _____\n", i+1);
     tributetest = TributeTest(&state, player1, player2, handPos);
 
     // Record Stats and if Failure occurs then print additional game information. 
-    if(tributetest)
-    {
-      counter_failure++;
-      printf("TEST #%d\n",i+1);
-      printf("Player1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player1],state.discardCount[player1],state.deckCount[player1]);
-      printf("Player2 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state.handCount[player2],state.discardCount[player2],state.deckCount[player2]);
-    }
+    if(tributetest){ counter_failure++; }
     else{counter_success++;}
 
   } // end of for-loop
@@ -307,6 +302,13 @@ int TributeTest(struct gameState *state, int player1, int player2, int handPos)
     if(assert_state){flagFail = 1; printf("\tDiscard Count: Current = %d, Expected = %d\n", testState.discardCount[player1], state->discardCount[player1]+1);}
   }
 
+
+  if(flagFail)
+  {
+    printf("  *More Information: \n");
+    printf("\tPlayer1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state->handCount[player1],state->discardCount[player1],state->deckCount[player1]);
+    printf("\tPlayer2 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state->handCount[player2],state->discardCount[player2],state->deckCount[player2]);
+  }
 
   return flagFail;
 }

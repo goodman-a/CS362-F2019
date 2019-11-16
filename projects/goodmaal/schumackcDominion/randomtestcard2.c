@@ -108,22 +108,11 @@ int main(int argc, char** argv){
     else{choice2 = 1;}
 
     // Run the Minion Random Test Iteration
+    printf("_____ TEST #%d _____\n",i+1);
     miniontest = MinionTest(&state, player1, handPos, choice1, choice2, num_players);
 
     // Record Stats and if Failure occurs then print additional game information. 
-    if(miniontest)
-    {
-      counter_failure++;
-      printf("TEST #%d\n",i+1);
-      for(r=0; r<num_players; r++)
-      {
-        printf("Player%d Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", r+1, state.handCount[r],state.discardCount[r],state.deckCount[r]);
-        DisplayHand(&state, r, "Player");
-      }
-      printf("Choice1: %d & Choice2: %d\n\n",choice1, choice2);
-    
-    
-    }
+    if(miniontest){ counter_failure++; }
     else{counter_success++;}
 
   } // end of primary for-loop
@@ -215,6 +204,19 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
 
         }
     }
+  }
+
+  if(flagFail)
+  {
+    printf("  *More Information: \n");
+    int r;
+    for(r=0; r<num_players; r++)
+    {
+      printf("\tPlayer%d Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", r+1, state->handCount[r],state->discardCount[r],state->deckCount[r]);
+      printf("\t");
+      DisplayHand(&state, r, "Player");
+    }
+    printf("\tChoice1: %d & Choice2: %d\n\n",choice1, choice2);
   }
 
   return flagFail;

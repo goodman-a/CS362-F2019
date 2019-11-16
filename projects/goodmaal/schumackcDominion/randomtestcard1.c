@@ -30,7 +30,7 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        //printf("PASS: %s\n", msg);
+        printf("PASS: %s\n", msg);
         return 0;
     }
     
@@ -234,7 +234,7 @@ int BaronTest(struct gameState *state, int player, int handPos, int choice1)
   if(flagFail){
     printf("  *More Information:\n");
     printf("\tPlayer1 Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", state->handCount[player],state->discardCount[player],state->deckCount[player]);
-    int hand_estate = HandCardCount(&state, player, estate);
+    int hand_estate = HandCardCount(state, player, estate);
     printf("\tNumber of Estates in Hand: %d vs. Current Estate Supply Count: %d\n",hand_estate, state->supplyCount[estate]);
     printf("\tChoice: %d\n\n",choice1);
   }

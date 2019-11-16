@@ -31,7 +31,7 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        //printf("PASS: %s\n", msg);
+        printf("PASS: %s\n", msg);
         return 0;
     }
     
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
   /* -- Variables for Comparison, Checks, and Vericiations -- */
 
   // general iterators
-  int i, j, r;
+  int i, j;
 
   // gameplay values
   int handPos = 0;

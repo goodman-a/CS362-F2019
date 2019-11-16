@@ -32,7 +32,7 @@ int AssertTest(int pass, char* msg)
     }
     else
     {
-        //printf("PASS: %s\n", msg);
+        printf("PASS: %s\n", msg);
         return 0;
     }
     
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
   /* -- Variables for Comparison, Checks, and Vericiations -- */
 
   // general iterators
-  int i, j, r;
+  int i, j;
 
   // gameplay values
   int handPos = 0, choice1 = 0, choice2 = 0;
@@ -214,7 +214,7 @@ int MinionTest(struct gameState *state, int player1, int handPos, int choice1, i
     {
       printf("\tPlayer%d Piles: Hand Count: %d ; Discard Count: %d ; Deck Count: %d\n", r+1, state->handCount[r],state->discardCount[r],state->deckCount[r]);
       printf("\t");
-      DisplayHand(&state, r, "Player");
+      DisplayHand(state, r, "Player");
     }
     printf("\tChoice1: %d & Choice2: %d\n\n",choice1, choice2);
   }

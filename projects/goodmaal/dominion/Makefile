@@ -57,7 +57,7 @@ randomtestcard3: randomtestcard3.c dominion.o rngs.o
 	gcc -o randomtestcard3 -g randomtestcard3.c dominion.o rngs.o $(CFLAGS)	
 
 
-all: playdom player 
+all: playdom player randomtestresults
 
 clean:
 	rm -f *.o playdom player testDrawCard randomtestcard1 *.exe *.gcov *.gcda *.gcno *.so *.out 

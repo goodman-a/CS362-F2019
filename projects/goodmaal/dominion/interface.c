@@ -230,7 +230,9 @@ void printDeck(int player, struct gameState *game) {
     printf("\n");
 }
 
+
 void printPlayed(int player, struct gameState *game) {
+    /*
     int playedCount = game->playedCardCount;
     int playedIndex;
     printf("Player %d's played cards: \n", player);
@@ -242,6 +244,8 @@ void printPlayed(int player, struct gameState *game) {
         printf("%-2d %-13s \n", playedIndex, name);
     }
     printf("\n");
+*/
+    printf("Played Cards Has Been Removed Due to Not Correctly Handling Them\n");
 }
 
 

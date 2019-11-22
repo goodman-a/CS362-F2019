@@ -1,0 +1,93 @@
+(gdb) Breakpoint 1 at 0x403daf: file dominion.c, line 75.
+(gdb) Starting program: C:\Users\agood\Documents\Git\CS362-F2019\projects\goodmaal\schumackcDominion/./unittest2.exe 
+[New Thread 29612.0x8110]
+[New Thread 29612.0x82a8]
+
+Breakpoint 1, minionCardEffect (choice1=1, choice2=0, state=0x62317c, 
+    handPos=0) at dominion.c:75
+75		int currentPlayer = whoseTurn(state);
+(gdb) Continuing.
+
+Breakpoint 1, minionCardEffect (choice1=0, choice2=1, state=0x62317c, 
+    handPos=0) at dominion.c:75
+75		int currentPlayer = whoseTurn(state);
+(gdb) No symbol "CurrentPlayer" in current context.
+(gdb) Hardware watchpoint 2: state->handCount[currentPlayer]
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = <unreadable>
+New value = 5
+0x00403dbd in minionCardEffect (choice1=0, choice2=1, state=0x62317c, 
+    handPos=0) at dominion.c:75
+75		int currentPlayer = whoseTurn(state);
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 5
+New value = 4
+0x00408c2d in discardCard (handPos=0, currentPlayer=0, state=0x62317c, 
+    trashFlag=0) at dominion.c:1362
+1362	        state->handCount[currentPlayer]--;
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 4
+New value = 3
+0x00408c2d in discardCard (handPos=0, currentPlayer=0, state=0x62317c, 
+    trashFlag=0) at dominion.c:1362
+1362	        state->handCount[currentPlayer]--;
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 3
+New value = 2
+0x00408c2d in discardCard (handPos=0, currentPlayer=0, state=0x62317c, 
+    trashFlag=0) at dominion.c:1362
+1362	        state->handCount[currentPlayer]--;
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 2
+New value = 1
+0x00408c2d in discardCard (handPos=0, currentPlayer=0, state=0x62317c, 
+    trashFlag=0) at dominion.c:1362
+1362	        state->handCount[currentPlayer]--;
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 1
+New value = 0
+0x00408b40 in discardCard (handPos=0, currentPlayer=0, state=0x62317c, 
+    trashFlag=0) at dominion.c:1348
+1348	        state->handCount[currentPlayer]--;
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 0
+New value = 1
+0x00406f67 in drawCard (player=0, state=0x62317c) at dominion.c:921
+921	        state->handCount[player]++;//Increment hand count
+(gdb) Continuing.
+Hardware watchpoint 2: state->handCount[currentPlayer]
+
+Old value = 1
+New value = 2
+0x00406f67 in drawCard (player=0, state=0x62317c) at dominion.c:921
+921	        state->handCount[player]++;//Increment hand count
+(gdb) Continuing.
+
+Watchpoint 2 deleted because the program has left the block in
+which its expression is valid.
+0x00401b32 in main (argc=1, argv=0xbe4a80) at unittest2.c:154
+154	    minion_return = minionCardEffect(choice1, choice2, &testState, handPos);
+(gdb) 155	    printf("Minion Value Returned: %d\n", minion_return);
+(gdb) printf (
+    __format=0x4150d0 <__register_frame_info+4280528> "Minion Value Returned: %d\n") at c:/mingw/include/stdio.h:380
+380	  __builtin_va_list __local_argv; __builtin_va_start( __local_argv, __format );
+(gdb) A debugging session is active.
+
+	Inferior 1 [process 29612] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+error return ../../gdb-7.6.1/gdb/windows-nat.c:1275 was 5

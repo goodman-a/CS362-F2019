@@ -1,0 +1,31 @@
+(gdb) Breakpoint 1 at 0x403dc2: file dominion.c, line 10.
+(gdb) Starting program: C:\Users\agood\Documents\Git\CS362-F2019\projects\goodmaal\schumackcDominion/./unittest1.exe 
+[New Thread 18552.0x3b50]
+[New Thread 18552.0x8308]
+
+Breakpoint 1, baronCardEffect (choice1=1, state=0x623124) at dominion.c:10
+10		int currentPlayer = whoseTurn(state);
+(gdb) Hardware watchpoint 2: state->coins
+(gdb) Continuing.
+Hardware watchpoint 2: state->coins
+
+Old value = 4
+New value = 6
+baronCardEffect (choice1=1, state=0x623124) at dominion.c:21
+21					state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
+(gdb) 16			while (card_not_discarded) {
+17				if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
+18	
+19					//BUG ADDED: Changed the number of coins added from 4 to 2, which is half of the correct amount.
+20					state->coins += 2;//Add 4 coins to the amount of coins
+21					state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
+22					state->discardCount[currentPlayer]++;
+23					for (; p < state->handCount[currentPlayer]; p++) {
+24						state->hand[currentPlayer][p] = state->hand[currentPlayer][p + 1];
+25					}
+(gdb) A debugging session is active.
+
+	Inferior 1 [process 18552] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+error return ../../gdb-7.6.1/gdb/windows-nat.c:1275 was 5

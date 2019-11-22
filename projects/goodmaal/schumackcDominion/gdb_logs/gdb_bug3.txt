@@ -1,0 +1,33 @@
+(gdb) Breakpoint 1 at 0x403daf: file dominion.c, line 75.
+(gdb) Starting program: C:\Users\agood\Documents\Git\CS362-F2019\projects\goodmaal\schumackcDominion/./unittest2.exe 
+[New Thread 20252.0x5f20]
+[New Thread 20252.0x37c4]
+
+Breakpoint 1, minionCardEffect (choice1=1, choice2=0, state=0x62317c, 
+    handPos=0) at dominion.c:75
+75		int currentPlayer = whoseTurn(state);
+(gdb) Hardware watchpoint 2: state->coins
+(gdb) Continuing.
+Hardware watchpoint 2: state->coins
+
+Old value = 4
+New value = 8
+0x00403e2a in minionCardEffect (choice1=1, choice2=0, state=0x62317c, 
+    handPos=0) at dominion.c:86
+86			state->coins = state->coins + 4;
+(gdb) 126		return 0;
+(gdb) 127	}
+(gdb) can't compute CFA for this frame
+0x004040db in minionCardEffect (
+    choice1=<error reading variable: can't compute CFA for this frame>, 
+    choice2=<error reading variable: can't compute CFA for this frame>, 
+    state=<error reading variable: can't compute CFA for this frame>, 
+    handPos=<error reading variable: can't compute CFA for this frame>)
+    at dominion.c:127
+127	}
+(gdb) A debugging session is active.
+
+	Inferior 1 [process 20252] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+error return ../../gdb-7.6.1/gdb/windows-nat.c:1275 was 5

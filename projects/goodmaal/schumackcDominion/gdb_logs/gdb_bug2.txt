@@ -1,0 +1,45 @@
+(gdb) Breakpoint 1 at 0x403dc2: file dominion.c, line 10.
+(gdb) Starting program: C:\Users\agood\Documents\Git\CS362-F2019\projects\goodmaal\schumackcDominion/./unittest1.exe 
+[New Thread 5920.0x6838]
+[New Thread 5920.0x7a90]
+
+Breakpoint 1, baronCardEffect (choice1=1, state=0x623124) at dominion.c:10
+10		int currentPlayer = whoseTurn(state);
+(gdb) Continuing.
+
+Breakpoint 1, baronCardEffect (choice1=1, state=0x623124) at dominion.c:10
+10		int currentPlayer = whoseTurn(state);
+(gdb) Continuing.
+
+Breakpoint 1, baronCardEffect (choice1=0, state=0x623124) at dominion.c:10
+10		int currentPlayer = whoseTurn(state);
+(gdb) whoseTurn (state=0x623124) at dominion.c:655
+655	    return state->whoseTurn;
+(gdb) 656	}
+(gdb) baronCardEffect (choice1=0, state=0x623124) at dominion.c:12
+12		state->numBuys++;//Increase buys by 1!
+(gdb) $1 = 0
+(gdb) 13		if (choice1 > 0) { //Boolean true or going to discard an estate
+(gdb) $2 = 0
+(gdb) 53			if (supplyCount(estate, state) > 0) {
+(gdb) supplyCount (card=1, state=0x623124) at dominion.c:629
+629	    return state->supplyCount[card];
+(gdb) 630	}
+(gdb) baronCardEffect (choice1=0, state=0x623124) at dominion.c:60
+60				state->supplyCount[estate]--;//Decrement Estates
+(gdb) $3 = 0
+(gdb) 61				if (supplyCount(estate, state) == 0) {
+(gdb) supplyCount (card=1, state=0x623124) at dominion.c:629
+629	    return state->supplyCount[card];
+(gdb) 630	}
+(gdb) baronCardEffect (choice1=0, state=0x623124) at dominion.c:68
+68		return 0;
+(gdb) 69	}
+(gdb) main (argc=1, argv=0xf54a80) at unittest1.c:232
+232	    printf("Baron Value Returned: %d\n", baron_return);
+(gdb) A debugging session is active.
+
+	Inferior 1 [process 5920] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+error return ../../gdb-7.6.1/gdb/windows-nat.c:1275 was 5
